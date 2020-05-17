@@ -1,5 +1,17 @@
+# ==============================================
+# Added-Avoidence
+Content/3rdParty/*
+Content/StarterContent/*
+Content/MegascansMeadowPack/*
+Content/ParagonGreystone/*
+Content/Ninja_Starter/*
+
+# ===============================================
+
 # Visual Studio 2015 user specific files
 .vs/
+
+.git/
 
 # Compiled Object files
 *.slo

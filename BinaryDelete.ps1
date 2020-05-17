@@ -1,0 +1,1 @@
+Remove-Item .\Binaries -Force -Recurse
