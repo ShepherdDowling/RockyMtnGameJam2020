@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Copyright by Shepherd Dowling under the Apache v2 licence
 
 #include "Support/Animate.h"
 #include "Support/Watch.h"

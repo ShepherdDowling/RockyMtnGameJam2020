@@ -2,7 +2,6 @@
 
 
 #include "Actor/BaseCharacter.h"
-
 #include "Support/Animate.h"
 
 #include "UObject/UObjectGlobals.h" 
@@ -10,18 +9,33 @@
 #include "Engine/World.h" 
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/BoxComponent.h" 
+#include "Components/SceneComponent.h"
+#include "Components/ArrowComponent.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
+
 #include "Math/UnrealMathUtility.h" 
-#include "Components/BoxComponent.h" 
+
 
 ABaseCharacter::ABaseCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+
+	/// If I set mesh outside the capsule I can get better collisions but can't move (which is worse)
+	//SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
+	//SetRootComponent(SceneComponent);
+	//GetCapsuleComponent()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+	//GetMesh()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+	//GetArrowComponent()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
@@ -38,13 +52,13 @@ ABaseCharacter::ABaseCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	//// Create a camera boom (pulls in towards the player if there is a collision)
+	/// Create a camera boom (pulls in towards the player if there is a collision)
 	//CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	//CameraBoom->SetupAttachment(RootComponent);
 	//CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	//CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
-	//// Create a follow camera
+	/// Create a follow camera (I'm not running this code because this game uses a shared camera)
 	//FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	//FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	//FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
@@ -57,8 +71,6 @@ ABaseCharacter::ABaseCharacter()
 	// It should also not take up world space (for that use SpawnActor)
 	Animate = CreateDefaultSubobject<UAnimate>(TEXT("Animator"));
 
-	// reparent the capsule
-	GetCapsuleComponent()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 ABaseCharacter::~ABaseCharacter()

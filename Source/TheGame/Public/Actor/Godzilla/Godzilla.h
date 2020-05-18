@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright by Shepherd Dowling under the Apache v2 licence
 
 #pragma once
 
@@ -31,5 +31,6 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	void TailWhip();
+	void Bite();
 };
 

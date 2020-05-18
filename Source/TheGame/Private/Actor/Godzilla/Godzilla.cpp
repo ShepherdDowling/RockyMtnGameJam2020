@@ -29,13 +29,18 @@ void AGodzilla::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction(TEXT("TailWhip"), IE_Pressed, this, &AGodzilla::TailWhip);
+	PlayerInputComponent->BindAction(TEXT("Bite"), IE_Pressed, this, &AGodzilla::Bite);
 }
 
 
 void AGodzilla::TailWhip()
 {
-	UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("Whip"));
 	Animate->Animate(TEXT("Attack/TailWhip/TailWhipMT"), true);
+}
+
+void AGodzilla::Bite()
+{
+	Animate->Animate(TEXT("Attack/Bite/BiteMT"), true);
 }
 
 
@@ -49,6 +54,7 @@ AGodzilla::AGodzilla()
 	Animate->SetActor(Cast<ABaseCharacter>(this));
 
 	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/TailWhip/TailWhipMT")));
+	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/Bite/BiteMT")));
 }
 
 

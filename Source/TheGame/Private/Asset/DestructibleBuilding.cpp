@@ -52,7 +52,13 @@ void ADestructibleBuilding::BeginPlay()
 
     SetActorTickEnabled(false);
     BuidlingStartZ = GetTransform().GetLocation().Z;
-    BuildingHeight = Cast<USkeletalMesh>(DestructableComponent->GetDestructibleMesh())->GetBounds().GetBox().GetSize().Z; // Z changes
+
+    auto dm = Cast<USkeletalMesh>(DestructableComponent->GetDestructibleMesh());
+    if (dm)
+        BuildingHeight = dm->GetBounds().GetBox().GetSize().Z; // Z changes
+    else
+        BuildingHeight = 100000;
+
     LocationLastTick = GetTransform().GetLocation();
     StartLocation = LocationLastTick;
 }
@@ -65,8 +71,7 @@ void ADestructibleBuilding::Tick(float DeltaTime)
     if (Watch->TimerIsRunning())
         return;
 
-    SetActorLocation(LocationLastTick);
-    LocationLastTick += FVector(0, 0, -0.2);
+    GetTransform().GetLocation() += FVector(0, 0, -0.2);
 
     float WorldScaling = 0.2; 
     float BufferDistance = 50000;

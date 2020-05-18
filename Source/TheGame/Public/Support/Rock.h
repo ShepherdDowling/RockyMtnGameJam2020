@@ -10,7 +10,7 @@
 typedef UGameplayStatics Statics;
 
 #define GetFirstPlayerPawn GetWorld()->GetFirstPlayerController()->GetPawn()
-#define GetFirstRanger Cast<ARanger>(GetWorld()->GetFirstPlayerController()->GetPawn())
+#define GetFirstGodzilla Cast<AGodzilla>(GetWorld()->GetFirstPlayerController()->GetPawn())
 #define GetFirstPlayerLocation GetWorld()->GetFirstPlayerController()->GetPawn()->GetTargetLocation()
 
 #define AnimatorBP ConstructorHelpers::FObjectFinder<UAnimSequence>

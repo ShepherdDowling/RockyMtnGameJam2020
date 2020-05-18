@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SceneComponent.h" 
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
@@ -68,6 +69,9 @@ protected: // --------------------------- THESE PROPERTIES ARE PART OF UE4'S SKE
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate;
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
+	USceneComponent* SceneComponent = nullptr;
            // -------------------------- END OF UE4'S PROPERTIES -------------------------------------------
 protected: // -------------------------- THESE FUNCTIONS ARE BY UE4'S SKELETON SCRIPT ----------------------
 	/** Resets HMD orientation in VR. */
