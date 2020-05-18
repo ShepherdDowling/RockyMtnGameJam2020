@@ -131,6 +131,11 @@ void ADefaultGameMode::StartPlay()
 void ADefaultGameMode::Tick(float DeltaSeconds)
 {
     UpdateHPBars();
+    for (auto player : GodzillaArr)
+    {
+        if (player->GetHP() == 0)
+            continue; // TODO: call game over with this player as the looser and the other as the winner
+    }
 }
 
 int ADefaultGameMode::GetMaxPlayerCount() const
