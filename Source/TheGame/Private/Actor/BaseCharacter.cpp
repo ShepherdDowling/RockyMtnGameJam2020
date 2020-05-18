@@ -16,6 +16,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Math/UnrealMathUtility.h" 
+#include "Components/BoxComponent.h" 
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -55,6 +56,9 @@ ABaseCharacter::ABaseCharacter()
 	// It is used for creating a class that supports your base class
 	// It should also not take up world space (for that use SpawnActor)
 	Animate = CreateDefaultSubobject<UAnimate>(TEXT("Animator"));
+
+	// reparent the capsule
+	GetCapsuleComponent()->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 ABaseCharacter::~ABaseCharacter()

@@ -59,8 +59,8 @@ void ARanger::FallBackwards()
 
 ARanger::ARanger()
 {
-	UAnimate::SetHome(TEXT("/Game/_Actors/Ranger/Animations"));
 	ensure(Animate);
+	UAnimate::SetHome(TEXT("/Game/_Actors/Ranger/Animations"));
 	Animate->SetActor(Cast<ABaseCharacter>(this));
 	Animate->Add(UAnimate::NewAnimation(TEXT("Ninja/Roll/Backwards")));
 	Animate->Add(UAnimate::NewAnimation(TEXT("Ninja/Punch/Cross")));

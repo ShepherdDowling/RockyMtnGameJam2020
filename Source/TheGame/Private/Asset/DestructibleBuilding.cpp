@@ -73,7 +73,7 @@ void ADestructibleBuilding::Tick(float DeltaTime)
 
     if(BuidlingStartZ > GetTransform().GetLocation().Z + (BuildingHeight * WorldScaling + BufferDistance))
         Destroy();
-
+    
     if (PhysicsEnabled)
     {
         PhysicsEnabled = false;

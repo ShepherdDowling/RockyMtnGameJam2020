@@ -28,20 +28,27 @@
 void AGodzilla::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAction(TEXT("TailWhip"), IE_Pressed, this, &AGodzilla::TailWhip);
 }
+
+
+void AGodzilla::TailWhip()
+{
+	UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("Whip"));
+	Animate->Animate(TEXT("Attack/TailWhip/TailWhipMT"), true);
+}
+
 
 // Sets default values
 AGodzilla::AGodzilla()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	UAnimate::SetHome(TEXT("/Game/_Actors/Godzilla/Animations"));
 	ensure(Animate);
+	UAnimate::SetHome(TEXT("/Game/_Actors/Godzilla/Animations"));
+	Animate->SetActor(Cast<ABaseCharacter>(this));
 
-	//this->SetSimulatePhysics(true);
-	//this->SetNotifyRigidBodyCollision(true);
-	//this->SetCollisionProfileName("BlockAllDynamic");
-	//this->OnComponentHit.AddDynamic(this, &ADestructibleBuilding::OnCompHit);
+	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/TailWhip/TailWhipMT")));
 }
 
 
@@ -54,6 +61,7 @@ AGodzilla::~AGodzilla()
 void AGodzilla::BeginPlay()
 {
 	Super::BeginPlay();
+	ensure(Animate);
 }
 
 // Called every frame

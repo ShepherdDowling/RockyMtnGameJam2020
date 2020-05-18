@@ -11,7 +11,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeathOnCharacterDelegate);
 
 class UAnimate;
 
-
 UCLASS()
 class THEGAME_API ABaseCharacter : public ACharacter
 {
