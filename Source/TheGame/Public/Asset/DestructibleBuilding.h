@@ -33,8 +33,9 @@ private:
 	UDestructibleComponent* DestructableComponent = nullptr;
 
 
-	bool printed = false;
 	bool TimerBuildingCollapseStarted = false;
+	bool PhysicsEnabled = true;
+	int32 ExpCounter = 1;
 	float BuildingHeight = 0;
 	float BuidlingStartZ = 0;
 	FVector LocationLastTick;

@@ -6,8 +6,8 @@
 #include "GameFramework/GameMode.h"
 #include "DefaultGameMode.generated.h"
 
-class ARanger;
-class ARangerPLC;
+class AGodzilla;
+class ABaseCharacter;
 class APlayerController;
 class AMobileCamera;
 class UDefaultUI;
@@ -22,8 +22,8 @@ class THEGAME_API ADefaultGameMode : public AGameMode
 	GENERATED_BODY()
 
 private:
-    ConstructorHelpers::FClassFinder<ACharacter>* BpRanger = nullptr;
-    ConstructorHelpers::FClassFinder<APlayerController>* BpRangerPLC = nullptr;
+    ConstructorHelpers::FClassFinder<ACharacter>* BpGodzilla = nullptr;
+    ConstructorHelpers::FClassFinder<APlayerController>* BpGodzillaPLC = nullptr;
     
     AMobileCamera* MobileCamera = nullptr;
     UUserWidget* DefaultUI = nullptr;
@@ -43,7 +43,7 @@ protected:
     TSubclassOf<class UDefaultUI> UIClass;
 
     TArray<AActor*>  PlayerStartArr;
-    TArray<ARanger*> RangerArr;
+    TArray<ABaseCharacter*> GodzillaArr;
 
 public:
     ADefaultGameMode();

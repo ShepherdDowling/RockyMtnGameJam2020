@@ -5,8 +5,7 @@
 #include "Support/Rock.h"
 #include "Asset/MobileCamera/MobileCamera.h"
 
-#include "Actor/Ranger/Ranger.h"
-#include "Actor/Ranger/RangerPLC.h"
+#include "Actor/Godzilla/Godzilla.h"
 
 #include "UMG/Public/Blueprint/UserWidget.h"
 #include "Widget/DefaultUI.h"
@@ -22,9 +21,9 @@ void ADefaultGameMode::UpdateHPBars()
 {
     for (int32 i = 0; i < MaxPlayerCount; i++)
     {
-        UProgressBar* LifeBar = Cast<UProgressBar>(RangerArr[0]->GetHUD()->WidgetTree->FindWidget(HPText[i]));
+        UProgressBar* LifeBar = Cast<UProgressBar>(GodzillaArr[0]->GetHUD()->WidgetTree->FindWidget(HPText[i]));
         if (LifeBar)
-            LifeBar->SetPercent(RangerArr[i]->GetHP());
+            LifeBar->SetPercent(GodzillaArr[i]->GetHP());
     }
 }
 
@@ -32,13 +31,13 @@ ADefaultGameMode::ADefaultGameMode()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    BpRanger = new ConstructorHelpers::FClassFinder<ACharacter>(TEXT("/Game/_Actors/Ranger/BpRanger"));
-    if (!(ensure(BpRanger) || ensure(BpRanger->Class)))
-        return;  //throw std::runtime_error("Game Couldn't Init BpRanger");
+    BpGodzilla = new ConstructorHelpers::FClassFinder<ACharacter>(TEXT("/Game/_Actors/Godzilla/BpGodzilla"));
+    if (!(ensure(BpGodzilla) || ensure(BpGodzilla->Class)))
+        return;  //throw std::runtime_error("Game Couldn't Init BpGodzilla");
 
-    BpRangerPLC = new ConstructorHelpers::FClassFinder<APlayerController>(TEXT("/Game/_Actors/Ranger/BpRangerPLC"));
-    if (!(ensure(BpRangerPLC) || ensure(BpRangerPLC->Class)))
-        return; //throw std::runtime_error("Game Couldn't Init BpRangerPLC");
+    //BpGodzillaPLC = new ConstructorHelpers::FClassFinder<APlayerController>(TEXT("/Game/_Actors/Godzilla/BpGodzillaPLC"));
+    //if (!(ensure(BpGodzillaPLC) || ensure(BpGodzillaPLC->Class)))
+    //    return; //throw std::runtime_error("Game Couldn't Init BpGodzillaPLC");
 
     // Only here if you want to set defaults in the editor
     static ConstructorHelpers::FClassFinder<UDefaultUI> HPWidgetFinder(TEXT("/Game/_Assets/UI/BpHPWidget"));
@@ -46,7 +45,7 @@ ADefaultGameMode::ADefaultGameMode()
         return; //throw std::runtime_error("Game Couldn't Init BpHPWidget");
 
     DefaultPawnClass = nullptr;
-    PlayerControllerClass = BpRangerPLC->Class;
+    //PlayerControllerClass = BpGodzillaPLC->Class;
     
     UIClass = HPWidgetFinder.Class;
 
@@ -58,11 +57,11 @@ ADefaultGameMode::ADefaultGameMode()
 
 ADefaultGameMode::~ADefaultGameMode()
 {
-    if (BpRanger)
-        delete BpRanger;
+    if (BpGodzilla)
+        delete BpGodzilla;
 
-    if (BpRangerPLC)
-        delete BpRangerPLC;
+    if (BpGodzillaPLC)
+        delete BpGodzillaPLC;
 }
 
 void ADefaultGameMode::StartPlay()
@@ -82,19 +81,19 @@ void ADefaultGameMode::StartPlay()
 
         if (!vController->GetPawn())
         {
-            FActorSpawnParameters vRangerSpawnParams;
-            vRangerSpawnParams.Owner = vController;
+            FActorSpawnParameters vGodzillaSpawnParams;
+            vGodzillaSpawnParams.Owner = vController;
 
-            ARanger* vRanger = GetWorld()->SpawnActor<ARanger>(
-                BpRanger->Class,
+            AGodzilla* vGodzilla = GetWorld()->SpawnActor<AGodzilla>(
+                BpGodzilla->Class,
                 PlayerStartArr[vPlayerIdx]->GetActorLocation(),
                 PlayerStartArr[vPlayerIdx]->GetActorRotation(),
-                vRangerSpawnParams
+                vGodzillaSpawnParams
                 );
 
-            vController->Possess(vRanger);
+            vController->Possess(vGodzilla);
         }
-        RangerArr.Add(Cast<ARanger>(vController->GetCharacter()));
+        GodzillaArr.Add(Cast<AGodzilla>(vController->GetCharacter()));
     }
 
     if (bUseSharedScreen)
@@ -116,14 +115,14 @@ void ADefaultGameMode::StartPlay()
 
         if (ensure(MobileCamera))
         {
-            MobileCamera->AddReferences(this, &PlayerStartArr, &RangerArr);
+            MobileCamera->AddReferences(this, &PlayerStartArr, &GodzillaArr);
             MobileCamera->LinkCameraAndActors();
         }
     }
 
     DefaultUI = CreateWidget<UDefaultUI>(GetWorld()->GetFirstPlayerController(), UIClass);
     if (!ensure(DefaultUI)) return;
-    Cast<ARanger>(GetWorld()->GetFirstPlayerController()->GetPawn())->SetHUD(DefaultUI);
+    Cast<AGodzilla>(GetWorld()->GetFirstPlayerController()->GetPawn())->SetHUD(DefaultUI);
     DefaultUI->AddToViewport();
 
     UpdateHPBars();

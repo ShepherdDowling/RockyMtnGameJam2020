@@ -12,7 +12,7 @@ class USpringArmComponent;
 class UCameraComponent;
 
 class AActor;
-class ARanger;
+class ABaseCharacter;
 class ADefaultGameMode;
 
 /*
@@ -29,7 +29,7 @@ private:
 	bool bInitComplete = false;
 	ADefaultGameMode* GameModePtr		= nullptr;
 	TArray<AActor*>*  PlayerStartsPtr	= nullptr;
-	TArray<ARanger*>* RangerListPtr		= nullptr;
+	TArray<ABaseCharacter*>* BaseCharacterListPtr		= nullptr;
 
 	FVector CurrentLocation;
 	FVector TargetLocation;
@@ -68,7 +68,7 @@ public:
 	AMobileCamera();
 
 	void Tick(float DeltaTime) override;
-	void AddReferences(ADefaultGameMode* iGameModePtr, TArray<AActor*>* iPlayerStartsPtr, TArray<ARanger*>* iRangerListPtr);
+	void AddReferences(ADefaultGameMode* iGameModePtr, TArray<AActor*>* iPlayerStartsPtr, TArray<ABaseCharacter*>* iBaseCharacterListPtr);
 	void LinkCameraAndActors();
 	void FollowAndSpanPlayers();
 };

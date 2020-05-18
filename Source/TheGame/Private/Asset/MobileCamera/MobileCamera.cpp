@@ -3,9 +3,7 @@
 #include "Asset/MobileCamera/MobileCamera.h"
 #include "Support/Rock.h"
 #include "Modes/DefaultGameMode.h"
-#include "Actor/Ranger/Ranger.h"
-#include "Actor/Ranger/RangerPLC.h"
-
+#include "Actor/BaseCharacter.h"
 
 
 #include "GameFramework/PlayerController.h" 
@@ -20,7 +18,7 @@ void AMobileCamera::UpdateSpringArmLength()
 {
 	// TODO: Update this so it works with more than 2 players
 	auto vActorDistance = FMath::Clamp<float>(
-		(*RangerListPtr)[0]->GetDistanceTo((*RangerListPtr)[1]),
+		(*BaseCharacterListPtr)[0]->GetDistanceTo((*BaseCharacterListPtr)[1]),
 		MinArmDistance,
 		MaxArmDistance
 		);
@@ -35,9 +33,9 @@ void AMobileCamera::UpdateCameraLocation()
 
 	float ClosestActorX = GetFirstPlayerLocation.X;
 	float FurthestActorX = GetFirstPlayerLocation.X;
-	for (ARanger* Ranger : *RangerListPtr)
+	for (ABaseCharacter* BaseCharacter : *BaseCharacterListPtr)
 	{
-		auto Location = Ranger->GetActorLocation();
+		auto Location = BaseCharacter->GetActorLocation();
 		TargetLocation += Location;
 		if (ClosestActorX > Location.X)
 			ClosestActorX = Location.X;
@@ -91,11 +89,11 @@ void AMobileCamera::Tick(float DeltaTime)
 	FollowAndSpanPlayers();
 }
 
-void AMobileCamera::AddReferences(ADefaultGameMode* iGameModePtr, TArray<AActor*>* iPlayerStartsPtr, TArray<ARanger*>* iRangerListPtr)
+void AMobileCamera::AddReferences(ADefaultGameMode* iGameModePtr, TArray<AActor*>* iPlayerStartsPtr, TArray<ABaseCharacter*>* iBaseCharacterListPtr)
 {
 	GameModePtr = iGameModePtr;
 	PlayerStartsPtr = iPlayerStartsPtr;
-	RangerListPtr = iRangerListPtr;
+	BaseCharacterListPtr = iBaseCharacterListPtr;
 }
 
 
@@ -104,9 +102,9 @@ void AMobileCamera::LinkCameraAndActors()
 	if (!GameModePtr)
 		return;
 
-	for (ARanger* ranger : *RangerListPtr)
+	for (ABaseCharacter* BaseCharacter : *BaseCharacterListPtr)
 	{
-		Cast<ARangerPLC>(ranger->GetController())->SetViewTargetWithBlend(this);
+		Cast<APlayerController>(BaseCharacter->GetController())->SetViewTargetWithBlend(this);
 	}
 }
 

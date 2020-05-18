@@ -27,16 +27,16 @@
 
 ADestructibleBuilding::ADestructibleBuilding()
 {
+    SetActorTickEnabled(false);
     PrimaryActorTick.bCanEverTick = true;
 
     DestructableComponent = CreateDefaultSubobject<UDestructibleComponent>("TheDestructableComponent");
     DestructableComponent->SetSimulatePhysics(true);
     DestructableComponent->SetNotifyRigidBodyCollision(true);
-    DestructableComponent->SetCollisionProfileName("Custom"); // view editor for specifics
+    DestructableComponent->SetCollisionProfileName("Destructible"); // view editor for specifics
     DestructableComponent->OnComponentHit.AddDynamic(this, &ADestructibleBuilding::OnCompHit);
     
     SetRootComponent(DestructableComponent);
-    SetTickGroup(ETickingGroup::TG_PostPhysics);
     Watch = new FWatch;
 }
 
@@ -53,7 +53,6 @@ void ADestructibleBuilding::BeginPlay()
     SetActorTickEnabled(false);
     BuidlingStartZ = GetTransform().GetLocation().Z;
     BuildingHeight = Cast<USkeletalMesh>(DestructableComponent->GetDestructibleMesh())->GetBounds().GetBox().GetSize().Z; // Z changes
-    //DestructableComponent->GetDestructibleMesh()->set
     LocationLastTick = GetTransform().GetLocation();
     StartLocation = LocationLastTick;
 }
@@ -61,14 +60,30 @@ void ADestructibleBuilding::BeginPlay()
 void ADestructibleBuilding::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    // Use this if you want to prevent the building from sinking all the way through
     if (Watch->TimerIsRunning())
         return;
 
-    SetActorLocation(GetTransform().GetLocation() + FVector(0, 0, -1));
+    SetActorLocation(LocationLastTick);
+    LocationLastTick += FVector(0, 0, -0.2);
 
     float WorldScaling = 0.2; 
-    if(BuidlingStartZ > GetTransform().GetLocation().Z + (BuildingHeight*WorldScaling))
+    float BufferDistance = 50000;
+
+    if(BuidlingStartZ > GetTransform().GetLocation().Z + (BuildingHeight * WorldScaling + BufferDistance))
         Destroy();
+
+    if (PhysicsEnabled)
+    {
+        PhysicsEnabled = false;
+        // TODO: Wthis does not ignore my building, why?
+        DestructableComponent->SetSimulatePhysics(false);
+        DestructableComponent->SetNotifyRigidBodyCollision(false);
+        DestructableComponent->SetCollisionProfileName("NoCollision");
+        DestructableComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        DestructableComponent->OnComponentHit.RemoveDynamic(this, &ADestructibleBuilding::OnCompHit);
+    }
 }
 
 void ADestructibleBuilding::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
@@ -88,10 +103,15 @@ void ADestructibleBuilding::OnCompHit(UPrimitiveComponent* HitComp, AActor* Othe
 
     UE_LOG(LogTemp, Warning, TEXT("GetTimeRemaining: %f"), Watch->GetTimeRemaining());
 
-    SetActorTickEnabled(true);
 
     UE_LOG(LogTemp, Warning, TEXT("LOG: %f"), DebrisTimeout);
-    Watch->SetTimer(static_cast<double>(DebrisTimeout));
+    // Instead, reset the timer if you want to prevent it form sinking all the way through
+    if(!TimerBuildingCollapseStarted)
+        Watch->SetTimer(static_cast<double>(DebrisTimeout));
+    else
+        SetActorTickEnabled(true);
+
     TimerBuildingCollapseStarted = true;
+
 }
 

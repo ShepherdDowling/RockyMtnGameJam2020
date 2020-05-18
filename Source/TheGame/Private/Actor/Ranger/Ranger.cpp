@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Actor/Ranger/Ranger.h"
-#include "Actor/BaseCharacter.h"
 #include "Support/Rock.h"
 #include "Support/Animate.h"
 #include "Widget/DefaultUI.h"
