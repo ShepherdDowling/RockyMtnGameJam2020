@@ -18,6 +18,9 @@
 void AMobileCamera::UpdateSpringArmLength()
 {
 	// TODO: Update this so it works with more than 2 players
+	if ((*BaseCharacterListPtr).Num() < 2)
+		return;
+
 	auto vActorDistance = FMath::Clamp<float>(
 		(*BaseCharacterListPtr)[0]->GetDistanceTo((*BaseCharacterListPtr)[1]),
 		MinArmDistance,
@@ -57,13 +60,8 @@ void AMobileCamera::BeginPlay()
 	Super::BeginPlay();
 	CurrentLocation = GetActorLocation();
 
-	//GetWorld()->GetTimerManager().SetTimer(
-	//	TimerHandle,
-	//	this,
-	//	&AMobileCamera::FollowAndSpanPlayers,
-	//	CamerUpdateInSeconds,
-	//	true
-	//);
+	if (GetWorld()->GetCurrentLevel()->GetName() != "BattleGrounds")
+		return;
 }
 
 
@@ -104,9 +102,8 @@ void AMobileCamera::LinkCameraAndActors()
 		return;
 
 	for (ABaseCharacter* BaseCharacter : *BaseCharacterListPtr)
-	{
 		Cast<APlayerController>(BaseCharacter->GetController())->SetViewTargetWithBlend(this);
-	}
+	
 }
 
 void AMobileCamera::FollowAndSpanPlayers()

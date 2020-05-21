@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <map>
-
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Animate.generated.h"
@@ -17,10 +15,8 @@ class UAnimMontage;
 class UAnimSequence;
 class UAnimSequenceBase;
 
-
 // AnimSequence : AnimSequenceBase
 // AnimMontage  : AnimCompositeBase: AnimSequenceBase
-
 
 /**
  *  This class creates a hash-map of animations for an actor

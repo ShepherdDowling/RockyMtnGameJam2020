@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright by Shepherd Dowling under the Apache v2 licence
 
 #pragma once
 
@@ -11,6 +11,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeathOnCharacterDelegate);
 
 class UAnimate;
+class UCollisionHandler;
+class UPhysicsHandleComponent;
 
 UCLASS()
 class THEGAME_API ABaseCharacter : public ACharacter
@@ -43,8 +45,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Setup")
 	class UUserWidget* HUD;
 
-	UPROPERTY()
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UCollisionHandler* cch = nullptr; // character collision handler
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UAnimate* Animate = nullptr;
+
 
 	ABaseCharacter();
 	virtual ~ABaseCharacter();
@@ -57,7 +64,7 @@ protected: // --------------------------- THESE PROPERTIES ARE PART OF UE4'S SKE
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	//class USpringArmComponent* CameraBoom;
 
-	///** Follow camera */
+	//** Follow camera */
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	//class UCameraComponent* FollowCamera;
 

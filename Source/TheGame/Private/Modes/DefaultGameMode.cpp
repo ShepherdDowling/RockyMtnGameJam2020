@@ -17,8 +17,94 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 
+
+
+void ADefaultGameMode::SpawnPlayers()
+{
+    for (auto player : GodzillaArr)
+        player->Destroy();
+    GodzillaArr.Empty();
+    
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArr);
+
+    for (int32 vPlayerIdx = 0; vPlayerIdx < PlayerStartArr.Num() && vPlayerIdx < MaxPlayerCount; vPlayerIdx++)
+    {
+        APlayerController* vController = Statics::GetPlayerControllerFromID(GetWorld(), vPlayerIdx);
+        
+        if (!vController)
+            vController = Statics::CreatePlayer(GetWorld(), vPlayerIdx, true); // true create controller
+
+        if (!ensure(vController))
+            continue;
+
+        if (!vController->GetPawn())
+        {
+            FActorSpawnParameters vGodzillaSpawnParams;
+            vGodzillaSpawnParams.Owner = vController;
+
+            AGodzilla* vGodzilla = GetWorld()->SpawnActor<AGodzilla>(
+                BpGodzilla->Class,
+                PlayerStartArr[vPlayerIdx]->GetActorLocation(),
+                PlayerStartArr[vPlayerIdx]->GetActorRotation(),
+                vGodzillaSpawnParams
+                );
+
+            vController->Possess(vGodzilla);
+        }
+        GodzillaArr.Add(Cast<AGodzilla>(vController->GetCharacter()));
+
+    }
+}
+
+void ADefaultGameMode::LockSharedCamera()
+{
+    if (bUseSharedScreen)
+    {
+        FActorSpawnParameters vMobileCameraSpawnParams;
+        vMobileCameraSpawnParams.Owner = this;
+
+        auto vCamLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTargetLocation() + FVector(-300, 0, 300);
+        // minus to make the camera go back behind the player
+        // 0 to stay inline with the player
+        // plus to get an arial view of the player
+        auto vCamRotation = FRotator(-40, 0, 0);
+        // X = Pitch = roller coaster
+        // Y = Roll  = Clock
+        // Z = Yaw   = left/right
+
+        MobileCamera = GetWorld()->SpawnActor<AMobileCamera>(AMobileCamera::StaticClass(),
+            vCamLocation, vCamRotation, vMobileCameraSpawnParams);
+
+        if (ensure(MobileCamera))
+        {
+            MobileCamera->AddReferences(this, &PlayerStartArr, &GodzillaArr);
+            MobileCamera->LinkCameraAndActors();
+        }
+    }
+}
+
+void ADefaultGameMode::AddHpBars()
+{
+    DefaultUI = CreateWidget<UDefaultUI>(GetWorld()->GetFirstPlayerController(), UIClass);
+    if (!ensure(DefaultUI)) return;
+    Cast<AGodzilla>(GetWorld()->GetFirstPlayerController()->GetPawn())->SetHUD(DefaultUI);
+    DefaultUI->AddToViewport();
+
+    UpdateHPBars();
+}
+
+void ADefaultGameMode::Init()
+{
+    SpawnPlayers();
+    LockSharedCamera();
+    AddHpBars();
+}
+
 void ADefaultGameMode::UpdateHPBars()
 {
+    if (GodzillaArr.Num() < 2)
+        return;
+
     for (int32 i = 0; i < MaxPlayerCount; i++)
     {
         UProgressBar* LifeBar = Cast<UProgressBar>(GodzillaArr[0]->GetHUD()->WidgetTree->FindWidget(HPText[i]));
@@ -68,64 +154,18 @@ void ADefaultGameMode::StartPlay()
 {
     Super::StartPlay();
 
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArr);
+    UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *GetWorld()->GetMapName());
+    if (!bLevelLoaded)
+        return;
 
-    for (int32 vPlayerIdx = 0; vPlayerIdx < PlayerStartArr.Num() && vPlayerIdx < MaxPlayerCount; vPlayerIdx++)
+    if (GetWorld()->GetMapName() != "UEDPIE_0_BattleGrounds")
     {
-        APlayerController* vController = Statics::GetPlayerControllerFromID(GetWorld(), vPlayerIdx);
-        if (!vController)
-            vController = Statics::CreatePlayer(GetWorld(), vPlayerIdx, true); // true create controller
-
-        if (!ensure(vController))
-            continue;
-
-        if (!vController->GetPawn())
-        {
-            FActorSpawnParameters vGodzillaSpawnParams;
-            vGodzillaSpawnParams.Owner = vController;
-
-            AGodzilla* vGodzilla = GetWorld()->SpawnActor<AGodzilla>(
-                BpGodzilla->Class,
-                PlayerStartArr[vPlayerIdx]->GetActorLocation(),
-                PlayerStartArr[vPlayerIdx]->GetActorRotation(),
-                vGodzillaSpawnParams
-                );
-
-            vController->Possess(vGodzilla);
-        }
-        GodzillaArr.Add(Cast<AGodzilla>(vController->GetCharacter()));
+        SetActorTickEnabled(false);
+        PrimaryActorTick.bCanEverTick = false;
+        return;
     }
 
-    if (bUseSharedScreen)
-    {
-        FActorSpawnParameters vMobileCameraSpawnParams;
-        vMobileCameraSpawnParams.Owner = this;
-
-        auto vCamLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTargetLocation() + FVector(-300, 0, 300);
-        // minus to make the camera go back behind the player
-        // 0 to stay inline with the player
-        // plus to get an arial view of the player
-        auto vCamRotation = FRotator(-45, 0, 0);
-        // X = Pitch = roller coaster
-        // Y = Roll  = Clock
-        // Z = Yaw   = left/right
-
-        MobileCamera = GetWorld()->SpawnActor<AMobileCamera>(AMobileCamera::StaticClass(),
-            vCamLocation, vCamRotation, vMobileCameraSpawnParams);
-
-        if (ensure(MobileCamera))
-        {
-            MobileCamera->AddReferences(this, &PlayerStartArr, &GodzillaArr);
-            MobileCamera->LinkCameraAndActors();
-        }
-    }
-
-    DefaultUI = CreateWidget<UDefaultUI>(GetWorld()->GetFirstPlayerController(), UIClass);
-    if (!ensure(DefaultUI)) return;
-    Cast<AGodzilla>(GetWorld()->GetFirstPlayerController()->GetPawn())->SetHUD(DefaultUI);
-    DefaultUI->AddToViewport();
-
-    UpdateHPBars();
+    Init();
 }
 
 void ADefaultGameMode::Tick(float DeltaSeconds)
@@ -134,11 +174,21 @@ void ADefaultGameMode::Tick(float DeltaSeconds)
     for (auto player : GodzillaArr)
     {
         if (player->GetHP() == 0)
-            continue; // TODO: call game over with this player as the looser and the other as the winner
+            true; // TODO: call game over with this player as the looser and the other as the winner
     }
 }
 
 int ADefaultGameMode::GetMaxPlayerCount() const
 {
     return MaxPlayerCount;
+}
+
+bool ADefaultGameMode::GetLevelLoaded() const
+{
+    return bLevelLoaded;
+}
+
+void ADefaultGameMode::SetLevelLoaded(bool truth)
+{
+    bLevelLoaded = truth;
 }

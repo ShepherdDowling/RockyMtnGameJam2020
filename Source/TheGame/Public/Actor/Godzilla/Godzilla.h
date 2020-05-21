@@ -10,6 +10,8 @@
 class UDefaultUI;
 class UAnimSequence;
 class UAnimate;
+class UCapsuleComponent;
+class UStaticMeshComponent;
 
 #define AnimatorBP ConstructorHelpers::FObjectFinder<UAnimSequence>
 
@@ -22,7 +24,6 @@ class AGodzilla : public ABaseCharacter
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
 public:
 	AGodzilla();
 	virtual ~AGodzilla();
@@ -32,5 +33,12 @@ public:
 
 	void TailWhip();
 	void Bite();
+
+
+	UFUNCTION()
+	void OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult);
+
+	UFUNCTION()
+	void OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 };
 

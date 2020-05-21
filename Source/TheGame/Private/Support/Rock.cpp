@@ -6,24 +6,19 @@
 #include "GameFramework/Actor.h"
 #include "Engine/World.h" 
 
-//// Called when the game starts or when spawned
-//void ARock::BeginPlay()
-//{
-//	Super::BeginPlay();
-//
-//}
 
-// Sets default values
-ARock::ARock()
+UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, const FString&& Name)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+    for (UActorComponent* Components : Actor->GetComponents())
+    {
+        auto PrimComp = Cast<UPrimitiveComponent>(Components);
+        if (!PrimComp)
+            continue;
+        if (PrimComp->GetName() == Name)
+            return PrimComp;
+        
+    }
+    return nullptr;
 }
 
-//// Called every frame
-//void ARock::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//
-//}
 

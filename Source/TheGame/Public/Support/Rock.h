@@ -14,12 +14,8 @@ typedef UGameplayStatics Statics;
 #define GetFirstPlayerLocation GetWorld()->GetFirstPlayerController()->GetPawn()->GetTargetLocation()
 
 #define AnimatorBP ConstructorHelpers::FObjectFinder<UAnimSequence>
-
 #endif
 
-// mc overlaps cc
-// mc will be used where cc can't is when there is
-// non-unreal engine inheritence in use.
 
 #include "CoreMinimal.h"
 #include "TimerManager.h"
@@ -30,15 +26,6 @@ UCLASS()
 class ARock : public AActor
 {
 	GENERATED_BODY()
-	
-private:	
-
-protected:
-	//virtual void BeginPlay() override;
-
 public:	
-	// Sets default values for this actor's properties
-	ARock();
-	//virtual void Tick(float DeltaTime) override;
+	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, const FString&& Name);
 };
-

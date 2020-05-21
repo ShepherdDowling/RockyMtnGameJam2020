@@ -55,7 +55,7 @@ protected:
 	float CamerUpdateInSeconds = 1;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	float MinArmDistance = 700;
+	float MinArmDistance = 1000;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float MaxArmDistance = 5000;

@@ -1,25 +1,26 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Copyright by Shepherd Dowling under the Apache v2 licence
 
 #include "Actor/BaseCharacter.h"
 #include "Support/Animate.h"
+#include "Support/CollisionHandler.h"
+#include "Support/Rock.h"
 
 #include "UObject/UObjectGlobals.h" 
 #include "UObject/ConstructorHelpers.h" 
 #include "Engine/World.h" 
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
 
-#include "Components/CapsuleComponent.h"
-#include "Components/InputComponent.h"
-#include "Components/BoxComponent.h" 
 #include "Components/SceneComponent.h"
+#include "Components/InputComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h" 
 #include "Components/ArrowComponent.h"
 
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #include "Math/UnrealMathUtility.h" 
 
@@ -70,7 +71,7 @@ ABaseCharacter::ABaseCharacter()
 	// It is used for creating a class that supports your base class
 	// It should also not take up world space (for that use SpawnActor)
 	Animate = CreateDefaultSubobject<UAnimate>(TEXT("Animator"));
-
+	cch		= CreateDefaultSubobject<UCollisionHandler>(TEXT("Character Collision Handler"));
 }
 
 ABaseCharacter::~ABaseCharacter()
@@ -82,6 +83,10 @@ ABaseCharacter::~ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	ensure(Animate);
+	ensure(cch);
+	cch->SetThisActor(Cast<ACharacter>(this)); 
+	// note: setting the trigger-capsule is done in the derived class
 }
 
 // Called every frame
@@ -128,6 +133,7 @@ void ABaseCharacter::OnResetVR()
 void ABaseCharacter::MoveForward(float Value)
 {
 	if (!Animate) return;
+	if (!cch) return;
 	if (!Animate->RunningBlueprint()) return;
 
 	if ((Controller != NULL) && (Value != 0.0f))
@@ -138,13 +144,19 @@ void ABaseCharacter::MoveForward(float Value)
 
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
 		AddMovementInput(Direction, Value);
+		if (!cch->GetCollidingActor())
+			AddMovementInput(Direction, Value);
+		else 
+			cch->ModifyDirectional(Direction, 0, Value); // X/Y axis
 	}
 }
 
 void ABaseCharacter::MoveRight(float Value)
 {
 	if (!Animate) return;
+	if (!cch) return;
 	if (!Animate->RunningBlueprint()) return;
 
 	if ((Controller != NULL) && (Value != 0.0f))
@@ -154,9 +166,14 @@ void ABaseCharacter::MoveRight(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// add movement in that direction
-		AddMovementInput(Direction, Value);
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); 
+		// add movement in that direction (value -1 = left, value +1 = right (hence move right to what extent)
+
+		if (!cch->GetCollidingActor())
+			AddMovementInput(Direction, Value);
+		else {
+			cch->ModifyDirectional(Direction, Value, 0); // X/Y axis
+		}
 	}
 }
 
@@ -186,3 +203,5 @@ int32 ABaseCharacter::GetTotalAnimationsPlayed() const
 {
 	return Animate->GetTotalAnimationsPlayed();
 }
+
+

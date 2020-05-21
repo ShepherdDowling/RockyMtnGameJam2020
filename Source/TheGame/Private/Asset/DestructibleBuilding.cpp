@@ -12,11 +12,10 @@
 
 #include "Support/Watch.h"
 
-
+#include "Components/PrimitiveComponent.h" 
 #include "Components/StaticMeshComponent.h" 
 #include "DestructibleComponent.h"
 
-#include "Components/PrimitiveComponent.h" 
 #include "Components/SphereComponent.h" 
 #include "Components/SceneComponent.h" 
 
@@ -79,6 +78,7 @@ void ADestructibleBuilding::Tick(float DeltaTime)
     if(BuidlingStartZ > GetTransform().GetLocation().Z + (BuildingHeight * WorldScaling + BufferDistance))
         Destroy();
     
+
     if (PhysicsEnabled)
     {
         PhysicsEnabled = false;
@@ -113,10 +113,10 @@ void ADestructibleBuilding::OnCompHit(UPrimitiveComponent* HitComp, AActor* Othe
     // Instead, reset the timer if you want to prevent it form sinking all the way through
     if(!TimerBuildingCollapseStarted)
         Watch->SetTimer(static_cast<double>(DebrisTimeout));
-    else
-        SetActorTickEnabled(true);
+    //else
+    //    SetActorTickEnabled(true); // TODO: Decide what to do with the disappearing bricks
+    // I am using static mobility instead 2 lines down
 
     TimerBuildingCollapseStarted = true;
-
 }
 

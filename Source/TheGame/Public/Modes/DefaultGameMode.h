@@ -44,12 +44,18 @@ protected:
 
     TArray<AActor*>  PlayerStartArr;
     TArray<ABaseCharacter*> GodzillaArr;
-
+    bool bLevelLoaded = false;
+    void SpawnPlayers();
+    void LockSharedCamera();
+    void AddHpBars();
 public:
+    void Init();
     ADefaultGameMode();
     virtual ~ADefaultGameMode();
     virtual void StartPlay() override;
     virtual void Tick(float DeltaSeconds) override;
 
     int GetMaxPlayerCount() const;
+    bool GetLevelLoaded() const;
+    void SetLevelLoaded(bool truth); 
 };
