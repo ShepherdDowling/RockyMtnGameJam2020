@@ -106,10 +106,7 @@ void ADestructibleBuilding::OnCompHit(UPrimitiveComponent* HitComp, AActor* Othe
     UGameplayStatics::ApplyRadialDamage(this, DamageTaken, Hit.ImpactPoint, WallStrength, TSubclassOf<UDamageType>(), 
         IgnoredActors, DamageCauser, InstegatedController, bDoFullDamage, ECollisionChannel::ECC_Visibility);
 
-    UE_LOG(LogTemp, Warning, TEXT("GetTimeRemaining: %f"), Watch->GetTimeRemaining());
 
-
-    UE_LOG(LogTemp, Warning, TEXT("LOG: %f"), DebrisTimeout);
     // Instead, reset the timer if you want to prevent it form sinking all the way through
     if(!TimerBuildingCollapseStarted)
         Watch->SetTimer(static_cast<double>(DebrisTimeout));

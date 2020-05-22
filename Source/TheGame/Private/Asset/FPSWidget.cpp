@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widget/FPSWidget.h"
+#include "Asset/FPSWidget.h"
+
 #include "Slate/SObjectWidget.h"
 #include "EngineGlobals.h"
 #include "Templates/SharedPointer.h" 

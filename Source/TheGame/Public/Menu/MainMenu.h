@@ -4,19 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Engine/LevelScriptActor.h"
-#include "MenuSystem.generated.h"
+#include "MainMenu.generated.h"
 
 /**
- * 
+ *   Level MainMenu inherits from this class
+ *   This class is responsible for displaying the Menu UI Widgets
  */
 UCLASS()
-class THEGAME_API AMenuSystem : public ALevelScriptActor
+class THEGAME_API AMainMenu : public ALevelScriptActor
 {
 	GENERATED_BODY()
 private:
     ConstructorHelpers::FClassFinder<UUserWidget>* MainMenu = nullptr;
 protected:
 
-    virtual ~AMenuSystem();
+    virtual ~AMainMenu();
     virtual void BeginPlay() override;
 };

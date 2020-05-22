@@ -2,7 +2,7 @@
 
 
 #include "Map/BattleGrounds.h"
-#include "Modes/DefaultGameMode.h"
+#include "Mode/DefaultGameMode.h"
 
 #include "UObject/UObjectGlobals.h" 
 #include "UObject/ConstructorHelpers.h" 

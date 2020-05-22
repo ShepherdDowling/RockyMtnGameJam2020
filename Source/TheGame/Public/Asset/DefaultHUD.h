@@ -8,13 +8,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "DefaultUI.generated.h"
+#include "DefaultHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class THEGAME_API UDefaultUI : public UUserWidget
+class THEGAME_API UDefaultHUD : public UUserWidget
 {
 	GENERATED_BODY()
 private:

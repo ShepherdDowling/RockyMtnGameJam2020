@@ -10,7 +10,7 @@ class AGodzilla;
 class ABaseCharacter;
 class APlayerController;
 class AMobileCamera;
-class UDefaultUI;
+class UDefaultHUD;
 class UUserWidget;
 class FWatch;
 
@@ -27,7 +27,7 @@ private:
     ConstructorHelpers::FClassFinder<APlayerController>* BpGodzillaPLC = nullptr;
     
     AMobileCamera* MobileCamera = nullptr;
-    UUserWidget* DefaultUI = nullptr;
+    UUserWidget* HUD = nullptr;
 
     TArray<FName> HPText;
 
@@ -41,7 +41,7 @@ protected:
     bool bUseSharedScreen = true;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TSubclassOf<class UDefaultUI> UIClass;
+    TSubclassOf<class UDefaultHUD> SubClassHUD;
 
     bool GameOver = false;
     FWatch* watch;
@@ -50,9 +50,11 @@ protected:
 
     FString Winner;
     bool bLevelLoaded = false;
+
     void SpawnPlayers();
     void LockSharedCamera();
     void AddHpBars();
+
 public:
     void Init();
     ADefaultGameMode();

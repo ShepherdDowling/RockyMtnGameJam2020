@@ -1,15 +1,15 @@
 // Copyright by Shepherd Dowling under the Apache v2 licence
 
 
-#include "Modes/DefaultGameMode.h"
+#include "Mode/DefaultGameMode.h"
 #include "Actor/Godzilla/Godzilla.h"
-#include "Asset/MobileCamera/MobileCamera.h"
+#include "Asset/MobileCamera.h"
 #include "Support/Rock.h"
 #include "Support/Watch.h"
 
 #include "GameFramework/Actor.h"
 #include "UMG/Public/Blueprint/UserWidget.h"
-#include "Widget/DefaultUI.h"
+#include "Asset/DefaultHUD.h"
 #include "UObject/UObjectGlobals.h" 
 #include "Engine/World.h" 
 #include "GameFramework/Controller.h"
@@ -83,10 +83,10 @@ void ADefaultGameMode::LockSharedCamera()
 
 void ADefaultGameMode::AddHpBars()
 {
-    DefaultUI = CreateWidget<UDefaultUI>(GetWorld()->GetFirstPlayerController(), UIClass);
-    if (!ensure(DefaultUI)) return;
-    Cast<AGodzilla>(GetWorld()->GetFirstPlayerController()->GetPawn())->SetHUD(DefaultUI);
-    DefaultUI->AddToViewport();
+    HUD = CreateWidget<UDefaultHUD>(GetWorld()->GetFirstPlayerController(), SubClassHUD);
+    if (!ensure(HUD)) return;
+    Cast<AGodzilla>(GetWorld()->GetFirstPlayerController()->GetPawn())->SetHUD(HUD);
+    HUD->AddToViewport();
 
     UpdateHPBars();
 }
@@ -124,14 +124,14 @@ ADefaultGameMode::ADefaultGameMode()
     //    return; //throw std::runtime_error("Game Couldn't Init BpGodzillaPLC");
 
     // Only here if you want to set defaults in the editor
-    static ConstructorHelpers::FClassFinder<UDefaultUI> HPWidgetFinder(TEXT("/Game/_Assets/UI/BpHPWidget"));
+    static ConstructorHelpers::FClassFinder<UDefaultHUD> HPWidgetFinder(TEXT("/Game/_Assets/BpHPWidget"));
     if (!ensure(HPWidgetFinder.Class))
         return; //throw std::runtime_error("Game Couldn't Init BpHPWidget");
 
     DefaultPawnClass = nullptr;
     //PlayerControllerClass = BpGodzillaPLC->Class;
     
-    UIClass = HPWidgetFinder.Class;
+    SubClassHUD = HPWidgetFinder.Class;
 
     HPText.Add(TEXT("Player1HP"));
     HPText.Add(TEXT("Player2HP"));

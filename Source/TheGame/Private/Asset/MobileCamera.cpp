@@ -1,9 +1,9 @@
 
 // Copyright by Shepherd Dowling under the Apache v2 licence
 
-#include "Asset/MobileCamera/MobileCamera.h"
+#include "Asset/MobileCamera.h"
 #include "Support/Rock.h"
-#include "Modes/DefaultGameMode.h"
+#include "Mode/DefaultGameMode.h"
 #include "Actor/BaseCharacter.h"
 
 

@@ -5,7 +5,7 @@
 #include "Support/Rock.h"
 #include "Support/Animate.h"
 #include "Support/CollisionHandler.h"
-#include "Widget/DefaultUI.h"
+#include "Asset/DefaultHUD.h"
 
 #include "UObject/UObjectGlobals.h" 
 #include "UObject/ConstructorHelpers.h" 
@@ -143,8 +143,6 @@ float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 
 void AGodzilla::OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnCompBeginOverlap: %s        %s"), *this->GetName(), *GetTargetLocation().ToString());
-
 	auto CollidingCharacter = Cast<ACharacter>(otherActor);
 	if(CollidingCharacter)
 		cch->SetCollidingActor(CollidingCharacter);
@@ -152,7 +150,6 @@ void AGodzilla::OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* 
 
 void AGodzilla::OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnCompEndOverlap: %s"), *this->GetName());
 	cch->SetCollidingActor(nullptr);
 }
 
