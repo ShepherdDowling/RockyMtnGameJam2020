@@ -4,21 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Engine/LevelScriptActor.h"
-#include "BattleGrounds.generated.h"
+#include "MenuSystem.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class THEGAME_API ABattleGrounds : public ALevelScriptActor
+class THEGAME_API AMenuSystem : public ALevelScriptActor
 {
 	GENERATED_BODY()
 private:
-    //ConstructorHelpers::FClassFinder<class AGameMode>* BpDefaultGameMode = nullptr;
+    ConstructorHelpers::FClassFinder<UUserWidget>* MainMenu = nullptr;
 protected:
 
-public:
-    ABattleGrounds();
-    virtual ~ABattleGrounds();
+    virtual ~AMenuSystem();
     virtual void BeginPlay() override;
 };

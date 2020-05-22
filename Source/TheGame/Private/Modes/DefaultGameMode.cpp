@@ -2,17 +2,16 @@
 
 
 #include "Modes/DefaultGameMode.h"
-#include "Support/Rock.h"
-#include "Asset/MobileCamera/MobileCamera.h"
-
 #include "Actor/Godzilla/Godzilla.h"
+#include "Asset/MobileCamera/MobileCamera.h"
+#include "Support/Rock.h"
+#include "Support/Watch.h"
 
+#include "GameFramework/Actor.h"
 #include "UMG/Public/Blueprint/UserWidget.h"
 #include "Widget/DefaultUI.h"
-
 #include "UObject/UObjectGlobals.h" 
 #include "Engine/World.h" 
-#include "GameFramework/Actor.h" 
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
@@ -29,10 +28,10 @@ void ADefaultGameMode::SpawnPlayers()
 
     for (int32 vPlayerIdx = 0; vPlayerIdx < PlayerStartArr.Num() && vPlayerIdx < MaxPlayerCount; vPlayerIdx++)
     {
-        APlayerController* vController = Statics::GetPlayerControllerFromID(GetWorld(), vPlayerIdx);
+        APlayerController* vController = UGameplayStatics::GetPlayerControllerFromID(GetWorld(), vPlayerIdx);
         
         if (!vController)
-            vController = Statics::CreatePlayer(GetWorld(), vPlayerIdx, true); // true create controller
+            vController = UGameplayStatics::CreatePlayer(GetWorld(), vPlayerIdx, true); // true create controller
 
         if (!ensure(vController))
             continue;
@@ -52,7 +51,6 @@ void ADefaultGameMode::SpawnPlayers()
             vController->Possess(vGodzilla);
         }
         GodzillaArr.Add(Cast<AGodzilla>(vController->GetCharacter()));
-
     }
 }
 
@@ -139,6 +137,8 @@ ADefaultGameMode::ADefaultGameMode()
     HPText.Add(TEXT("Player2HP"));
     HPText.Add(TEXT("Player3HP"));
     HPText.Add(TEXT("Player4HP"));
+
+    watch = new FWatch;
 }
 
 ADefaultGameMode::~ADefaultGameMode()
@@ -148,6 +148,9 @@ ADefaultGameMode::~ADefaultGameMode()
 
     if (BpGodzillaPLC)
         delete BpGodzillaPLC;
+
+    if (watch)
+        delete watch;
 }
 
 void ADefaultGameMode::StartPlay()
@@ -164,17 +167,28 @@ void ADefaultGameMode::StartPlay()
         PrimaryActorTick.bCanEverTick = false;
         return;
     }
-
     Init();
 }
 
 void ADefaultGameMode::Tick(float DeltaSeconds)
 {
     UpdateHPBars();
-    for (auto player : GodzillaArr)
+    if (!GameOver)
     {
-        if (player->GetHP() == 0)
-            true; // TODO: call game over with this player as the looser and the other as the winner
+        for (auto player : GodzillaArr)
+        {
+            if (player->GetHP() == 0)
+            {
+                GameOver = true;
+                Winner = player->GetName();
+                watch->SetTimer(4);
+            }
+        }
+    }
+    else if (GameOver && (!watch->TimerIsRunning()))
+    {
+        UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenu"));
+        RemoveFromRoot();
     }
 }
 

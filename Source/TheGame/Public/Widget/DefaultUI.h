@@ -20,5 +20,4 @@ class THEGAME_API UDefaultUI : public UUserWidget
 private:
 
 
-
 };

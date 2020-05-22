@@ -51,7 +51,7 @@ FVector UCollisionHandler::GetCollisionLocation()
 
 void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X, float Y)
 {
-	// This function is called once at a time from Forward/Right movment
+	// This function is called once at a time from Forward/Right movement
 
 	// Use 4 bone sockets to help your collisions navigate
 	// Front, Back, Left, Right
@@ -75,7 +75,7 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 		bool CollisionAhead = CollidingTriggerCapsule->OverlapComponent(HeadLocation, FQuat(), FCollisionShape::MakeSphere(1));
 
 		if (CollisionAhead && Y < 0)
-			ThisActor->AddMovementInput(DirectionalRef, Y); // Make movment
+			ThisActor->AddMovementInput(DirectionalRef, Y); // Make movement
 
 		
 	}

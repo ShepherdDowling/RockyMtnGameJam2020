@@ -16,7 +16,6 @@ UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, const FString
             continue;
         if (PrimComp->GetName() == Name)
             return PrimComp;
-        
     }
     return nullptr;
 }

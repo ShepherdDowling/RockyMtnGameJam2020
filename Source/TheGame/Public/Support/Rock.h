@@ -7,13 +7,13 @@
 #ifndef __CUSTOM_MODS__
 #define __CUSTOM_MODS__
 
-typedef UGameplayStatics Statics;
-
-#define GetFirstPlayerPawn GetWorld()->GetFirstPlayerController()->GetPawn()
-#define GetFirstGodzilla Cast<AGodzilla>(GetWorld()->GetFirstPlayerController()->GetPawn())
-#define GetFirstPlayerLocation GetWorld()->GetFirstPlayerController()->GetPawn()->GetTargetLocation()
-
 #define AnimatorBP ConstructorHelpers::FObjectFinder<UAnimSequence>
+
+#define GetFirstPlayerPawn		GetWorld()->GetFirstPlayerController()->GetPawn()
+#define GetFirstPlayerLocation	GetWorld()->GetFirstPlayerController()->GetPawn()->GetTargetLocation()
+
+#define GetFirstGodzilla		Cast<AGodzilla>(GetWorld()->GetFirstPlayerController()->GetPawn())
+
 #endif
 
 

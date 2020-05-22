@@ -12,6 +12,7 @@ class APlayerController;
 class AMobileCamera;
 class UDefaultUI;
 class UUserWidget;
+class FWatch;
 
 /**
  * 
@@ -42,8 +43,12 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TSubclassOf<class UDefaultUI> UIClass;
 
+    bool GameOver = false;
+    FWatch* watch;
     TArray<AActor*>  PlayerStartArr;
     TArray<ABaseCharacter*> GodzillaArr;
+
+    FString Winner;
     bool bLevelLoaded = false;
     void SpawnPlayers();
     void LockSharedCamera();

@@ -67,6 +67,7 @@ AGodzilla::AGodzilla()
 
 	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/TailWhip/TailWhipMT")));
 	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/Bite/BiteMT")));
+	Animate->Add(UAnimate::NewAnimation(TEXT("Movement/Die")));
 }
 
 
@@ -80,7 +81,6 @@ void AGodzilla::BeginPlay()
 {
 	Super::BeginPlay();
 	ensure(Animate);
-
 
 	auto Capsule = ARock::GetActorComponent(this, TEXT("TriggerCapsule"));
 	if (ensure(Capsule))
@@ -130,8 +130,11 @@ float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 	int32 DamageToApply = FMath::Clamp<int32>(RoundedDamagePoints, 0, Health.Current);
 	Health.Current -= DamageToApply;
 
-	if (Health.Current <= 0)
+	if (Health.Current <= 0) 
+	{
+		Animate->Animate("Movement/Die");
 		OnDeath.Broadcast();
+	}
 
 	// TODO: GODZILLA FALLS BACKWARDS
 	//Animate->Animate(TEXT("Ninja/Fall/Backwards"), true, true);
@@ -150,7 +153,6 @@ void AGodzilla::OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* 
 void AGodzilla::OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnCompEndOverlap: %s"), *this->GetName());
-
 	cch->SetCollidingActor(nullptr);
 }
 
