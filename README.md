@@ -7,4 +7,4 @@ Programming: Shepherd Dowling
 Graphics & Animation: Brian  
 
 
-This Project is Under Development, the game-jam is Not over.
+This project will stay under devlopment even though the game-jam finished.
