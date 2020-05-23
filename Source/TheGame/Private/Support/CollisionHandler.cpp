@@ -24,22 +24,27 @@ UCollisionHandler::UCollisionHandler()
 
 }
 
-void UCollisionHandler::SetThisActor(ACharacter* thisActor)
+void UCollisionHandler::BeginPlay()
 {
-	ThisActor = thisActor;
+	Super::BeginPlay();
 }
 
-void UCollisionHandler::SetTriggerCapsule(UPrimitiveComponent* triggerCapsule)
+void UCollisionHandler::Init(ACharacter* thisCharacter, FString&& triggerCapsuleName)
 {
-	TriggerCapsule = triggerCapsule;
+	ThisCharacter = thisCharacter;
+	TriggerComponent = ARock::GetActorComponent(ThisCharacter, triggerCapsuleName);
 }
 
-void UCollisionHandler::SetCollidingActor(ACharacter* actor)
+UPrimitiveComponent* UCollisionHandler::GetTriggerComponent() const {
+	return TriggerComponent;
+}
+
+void UCollisionHandler::SetCollidingActor(AActor* actor)
 {
 	CollidingActor = actor;
 }
 
-ACharacter* UCollisionHandler::GetCollidingActor() const
+AActor* UCollisionHandler::GetCollidingActor() const
 {
 	return CollidingActor;
 }
@@ -70,12 +75,12 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 		// else
 		//   move forward
 
-		auto HeadLocation = ThisActor->GetMesh()->GetBoneLocation(FName("Head_M"));
-		auto CollidingTriggerCapsule = Cast<UCapsuleComponent>(ARock::GetActorComponent(CollidingActor, "TriggerCapsule"));
-		bool CollisionAhead = CollidingTriggerCapsule->OverlapComponent(HeadLocation, FQuat(), FCollisionShape::MakeSphere(1));
+		auto HeadLocation = ThisCharacter->GetMesh()->GetBoneLocation(FName("Head_Socket"));
+		auto CollidingObject = Cast<UCapsuleComponent>(ARock::GetActorComponent(CollidingActor, "TriggerCapsule"));
+		bool CollisionAhead = CollidingObject->OverlapComponent(HeadLocation, Empty.Quat, Empty.Shape);
 
 		if (CollisionAhead && Y < 0)
-			ThisActor->AddMovementInput(DirectionalRef, Y); // Make movement
+			ThisCharacter->AddMovementInput(DirectionalRef, Y); // Make movement
 	}
 }
 

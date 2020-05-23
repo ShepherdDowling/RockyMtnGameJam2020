@@ -15,6 +15,7 @@ class UStaticMeshComponent;
 class UPhysicsHandleComponent;
 class UPrimitiveComponent;
 class USceneComponent;
+class UDualHandle;
 
 #define AnimatorBP ConstructorHelpers::FObjectFinder<UAnimSequence>
 
@@ -29,9 +30,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	USceneComponent* Scene = nullptr;
 
-
-
-	//FDualHandel* Dh1;
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UDualHandle* DualHandle = nullptr;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

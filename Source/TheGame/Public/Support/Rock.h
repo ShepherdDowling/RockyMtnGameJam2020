@@ -26,6 +26,7 @@ UCLASS()
 class ARock : public AActor
 {
 	GENERATED_BODY()
-public:	
-	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, const FString&& Name);
+public:
+	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, const FString& Name);
+	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, FString&& Name);
 };

@@ -1,4 +1,3 @@
-
 // Copyright by Shepherd Dowling under the Apache v2 licence
 
 #include "Asset/MobileCamera.h"

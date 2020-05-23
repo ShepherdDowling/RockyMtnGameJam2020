@@ -2,10 +2,11 @@
 
 
 #include "Actor/Godzilla/Godzilla.h"
+#include "Asset/DefaultHUD.h"
 #include "Support/Rock.h"
 #include "Support/Animate.h"
 #include "Support/CollisionHandler.h"
-#include "Asset/DefaultHUD.h"
+#include "Support/DualHandle.h"
 
 #include "UObject/UObjectGlobals.h" 
 #include "UObject/ConstructorHelpers.h" 
@@ -69,6 +70,7 @@ AGodzilla::AGodzilla()
 	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/Bite/BiteMT")));
 	Animate->Add(UAnimate::NewAnimation(TEXT("Movement/Die")));
 
+	//DualHandle = CreateDefaultSubobject<UDualHandle>("DualHandle");
 }
 
 
@@ -83,25 +85,17 @@ void AGodzilla::BeginPlay()
 	Super::BeginPlay();
 	ensure(Animate);
 
-	auto Capsule = ARock::GetActorComponent(this, TEXT("TriggerCapsule"));
-	if (ensure(Capsule))
-	{
-		cch->SetTriggerCapsule(Capsule);
-		Cast<UCapsuleComponent>(Capsule)->OnComponentBeginOverlap.AddDynamic(this, &AGodzilla::OnCompBeginOverlap);
-		Cast<UCapsuleComponent>(Capsule)->OnComponentEndOverlap.AddDynamic(this, &AGodzilla::OnCompEndOverlap);
-	}
-	//Dh1->TargetComponent = ARock::GetActorComponent(this, TEXT("CollisionCapsule1"));
-	//Dh1->HandleOneBoneLock("Head_M");
-	//Dh1->HandleTwoBoneLock("Head_M");
+	CollisionHandler->GetTriggerComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGodzilla::OnCompBeginOverlap);
+	CollisionHandler->GetTriggerComponent()->OnComponentEndOverlap.AddDynamic(this, &AGodzilla::OnCompEndOverlap);
+	
+	//DualHandle->Init(this, ARock::GetActorComponent(this, TEXT("HeadCapsule")), TEXT("Head_M"));
 }
 
 // Called every frame
 void AGodzilla::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//Dh1->One->SetTargetLocation(GetMesh()->GetBoneLocation(FName("Head_M")) + FVector(30, 30, 30));
-	//Dh1->Two->SetTargetLocation(GetMesh()->GetBoneLocation(FName("Head_M")) + FVector(-30, -30, -30));
+	//DualHandle->UpdateGrip();
 }
 
 float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -152,30 +146,10 @@ void AGodzilla::OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* 
 {
 	auto CollidingCharacter = Cast<ACharacter>(otherActor);
 	if(CollidingCharacter)
-		cch->SetCollidingActor(CollidingCharacter);
+		CollisionHandler->SetCollidingActor(CollidingCharacter);
 }
 
 void AGodzilla::OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	cch->SetCollidingActor(nullptr);
+	CollisionHandler->SetCollidingActor(nullptr);
 }
-
-//void  AGodzilla::FDualHandel::HandleOneBoneLock(FName&& BoneName)
-//{
-//	One->GrabComponentAtLocationWithRotation(
-//		Cast<UPrimitiveComponent>(TargetComponent),
-//		NAME_None,
-//		ThisCharacter->GetMesh()->GetBoneLocation(BoneName) + FVector(30, 30, 30),
-//		FRotator(0, 0, 0)
-//	);
-//}
-//
-//void AGodzilla::FDualHandel::HandleTwoBoneLock(FName&& BoneName)
-//{
-//	Two->GrabComponentAtLocationWithRotation(
-//		Cast<UPrimitiveComponent>(TargetComponent),
-//		NAME_None,
-//		ThisCharacter->GetMesh()->GetBoneLocation(BoneName) + FVector(-30, -30, -30),
-//		FRotator(0, 0, 0)
-//	);
-//}

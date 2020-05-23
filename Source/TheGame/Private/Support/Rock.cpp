@@ -7,7 +7,7 @@
 #include "Engine/World.h" 
 
 
-UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, const FString&& Name)
+UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, const FString& Name)
 {
     for (UActorComponent* Components : Actor->GetComponents())
     {
@@ -21,3 +21,8 @@ UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, const FString
 }
 
 
+
+UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, FString&& Name)
+{
+    return ARock::GetActorComponent(Actor, Name);
+}

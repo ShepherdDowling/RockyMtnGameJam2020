@@ -71,7 +71,7 @@ ABaseCharacter::ABaseCharacter()
 	// It is used for creating a class that supports your base class
 	// It should also not take up world space (for that use SpawnActor)
 	Animate = CreateDefaultSubobject<UAnimate>(TEXT("Animator"));
-	cch		= CreateDefaultSubobject<UCollisionHandler>(TEXT("Character Collision Handler"));
+	CollisionHandler = CreateDefaultSubobject<UCollisionHandler>(TEXT("Character Collision Handler"));
 }
 
 ABaseCharacter::~ABaseCharacter()
@@ -83,10 +83,10 @@ ABaseCharacter::~ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	ensure(Animate);
-	ensure(cch);
-	cch->SetThisActor(Cast<ACharacter>(this)); 
-	// note: setting the trigger-capsule is done in the derived class
+	ensure(CollisionHandler);
+	CollisionHandler->Init(this, TEXT("TriggerCapsule"));
 }
 
 // Called every frame
@@ -133,7 +133,7 @@ void ABaseCharacter::OnResetVR()
 void ABaseCharacter::MoveForward(float Value)
 {
 	if (!Animate) return;
-	if (!cch) return;
+	if (!CollisionHandler) return;
 	if (!Animate->RunningBlueprint()) return;
 
 	if ((Controller != NULL) && (Value != 0.0f))
@@ -146,17 +146,17 @@ void ABaseCharacter::MoveForward(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 		AddMovementInput(Direction, Value);
-		if (!cch->GetCollidingActor())
+		if (!CollisionHandler->GetCollidingActor())
 			AddMovementInput(Direction, Value);
 		else 
-			cch->ModifyDirectional(Direction, 0, Value); // X/Y axis
+			CollisionHandler->ModifyDirectional(Direction, 0, Value); // X/Y axis
 	}
 }
 
 void ABaseCharacter::MoveRight(float Value)
 {
 	if (!Animate) return;
-	if (!cch) return;
+	if (!CollisionHandler) return;
 	if (!Animate->RunningBlueprint()) return;
 
 	if ((Controller != NULL) && (Value != 0.0f))
@@ -169,10 +169,10 @@ void ABaseCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); 
 		// add movement in that direction (value -1 = left, value +1 = right (hence move right to what extent)
 
-		if (!cch->GetCollidingActor())
+		if (!CollisionHandler->GetCollidingActor())
 			AddMovementInput(Direction, Value);
 		else {
-			cch->ModifyDirectional(Direction, Value, 0); // X/Y axis
+			CollisionHandler->ModifyDirectional(Direction, Value, 0); // X/Y axis
 		}
 	}
 }

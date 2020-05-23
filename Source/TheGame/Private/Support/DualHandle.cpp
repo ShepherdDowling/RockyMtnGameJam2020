@@ -1,21 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright by Shepherd Dowling under the Apache v2 licence
 
 
 #include "Support/DualHandle.h"
 
+#include "GameFramework/Character.h"
 #include "Components/PrimitiveComponent.h" 
+#include "Components/StaticMeshComponent.h" 
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
 
-// Sets default values
-ADualHandle::ADualHandle()
-{
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-}
-
-void ADualHandle::Init(ACharacter* ThisCharacter, UPrimitiveComponent* TargetComponent, FName&& BoneName)
-	: ThisChracter(ThisCharacter), TargetComponent(TargetComponent), BoneName(BoneName)
+UDualHandle::UDualHandle()
 {
 	One = CreateDefaultSubobject<UPhysicsHandleComponent>("Handle One");
 	Two = CreateDefaultSubobject<UPhysicsHandleComponent>("Handle Two");
@@ -30,16 +24,14 @@ void ADualHandle::Init(ACharacter* ThisCharacter, UPrimitiveComponent* TargetCom
 	Two->SetAngularStiffness(Friction);
 }
 
-ADualHandle::~ADualHandle()
-{
-}
 
-// Called when the game starts or when spawned
-void ADualHandle::BeginPlay()
+void UDualHandle::Init(ACharacter* iThisCharacter, UPrimitiveComponent* iTargetComponent, FName&& iBoneName)
 {
-	Super::BeginPlay();
-	
-	auto GrabTarget[this](UPhysicsHandleComponent* Handle, float Offset) -> void
+	ThisCharacter	= iThisCharacter;
+	TargetComponent = iTargetComponent;
+	BoneName		= iBoneName;
+
+	auto GrabTarget = [this](UPhysicsHandleComponent* Handle, float Offset) -> void
 	{
 		Handle->GrabComponentAtLocationWithRotation(
 			Cast<UPrimitiveComponent>(TargetComponent),
@@ -48,15 +40,13 @@ void ADualHandle::BeginPlay()
 			FRotator(0, 0, 0)
 		);
 	};
-	GrabTarget(One,  GrabOffset);
+	GrabTarget(One, GrabOffset);
 	GrabTarget(Two, -GrabOffset);
 }
 
 // Called every frame
-void ADualHandle::Tick(float DeltaTime)
+void UDualHandle::UpdateGrip()
 {
-	Super::Tick(DeltaTime);
-
 	One->SetTargetLocation(ThisCharacter->GetMesh()->GetBoneLocation(BoneName) + FVector( GrabOffset,  GrabOffset,  GrabOffset));
 	Two->SetTargetLocation(ThisCharacter->GetMesh()->GetBoneLocation(BoneName) + FVector(-GrabOffset, -GrabOffset, -GrabOffset));
 }

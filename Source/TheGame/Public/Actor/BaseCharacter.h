@@ -18,6 +18,7 @@ UCLASS()
 class THEGAME_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
+private:
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
@@ -47,7 +48,7 @@ protected:
 
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UCollisionHandler* cch = nullptr; // character collision handler
+	UCollisionHandler* CollisionHandler = nullptr; // character collision handler
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UAnimate* Animate = nullptr;

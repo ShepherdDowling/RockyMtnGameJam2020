@@ -1,16 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright by Shepherd Dowling under the Apache v2 licence
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Components/ActorComponent.h"
 #include "DualHandle.generated.h"
 
+class ACharacter;
 class UPhysicsHandleComponent;
 class UPrimitiveComponent;
 
 UCLASS()
-class THEGAME_API ADualHandle : public AActor
+class THEGAME_API UDualHandle : public UActorComponent
 {
 	GENERATED_BODY()
 	
@@ -31,14 +32,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float GrabOffset = 50;
 
-
-	virtual void BeginPlay() override;
-
 public:
-	ADualHandle();
-	void Init(ACharacter* ThisCharacter, UPrimitiveComponent* TargetComponent, FName&& BoneName);
-	virtual ~ADualHandle();
-	virtual void Tick(float DeltaTime) override;
-
-
+	UDualHandle();
+	// Place this in "AActor::BeginPlay()"
+	void Init(ACharacter* iThisCharacter, UPrimitiveComponent* iTargetComponent, FName&& iBoneName);
+	// Place this in "AActor::Tick()"
+	void UpdateGrip();
 };
