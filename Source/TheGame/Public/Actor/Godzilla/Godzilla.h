@@ -12,6 +12,9 @@ class UAnimSequence;
 class UAnimate;
 class UCapsuleComponent;
 class UStaticMeshComponent;
+class UPhysicsHandleComponent;
+class UPrimitiveComponent;
+class USceneComponent;
 
 #define AnimatorBP ConstructorHelpers::FObjectFinder<UAnimSequence>
 
@@ -20,8 +23,16 @@ UCLASS(config = Game)
 class AGodzilla : public ABaseCharacter
 {
 	GENERATED_BODY()
+private:
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	USceneComponent* Scene = nullptr;
+
+
+
+	//FDualHandel* Dh1;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:

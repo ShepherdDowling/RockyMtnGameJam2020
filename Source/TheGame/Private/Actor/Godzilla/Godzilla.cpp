@@ -16,6 +16,7 @@
 #include "Components/InputComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/StaticMeshComponent.h" 
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
@@ -26,7 +27,6 @@
 
 #include "Engine/World.h" 
 #include "Math/UnrealMathUtility.h" 
-#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
@@ -68,6 +68,7 @@ AGodzilla::AGodzilla()
 	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/TailWhip/TailWhipMT")));
 	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/Bite/BiteMT")));
 	Animate->Add(UAnimate::NewAnimation(TEXT("Movement/Die")));
+
 }
 
 
@@ -89,12 +90,18 @@ void AGodzilla::BeginPlay()
 		Cast<UCapsuleComponent>(Capsule)->OnComponentBeginOverlap.AddDynamic(this, &AGodzilla::OnCompBeginOverlap);
 		Cast<UCapsuleComponent>(Capsule)->OnComponentEndOverlap.AddDynamic(this, &AGodzilla::OnCompEndOverlap);
 	}
+	//Dh1->TargetComponent = ARock::GetActorComponent(this, TEXT("CollisionCapsule1"));
+	//Dh1->HandleOneBoneLock("Head_M");
+	//Dh1->HandleTwoBoneLock("Head_M");
 }
 
 // Called every frame
 void AGodzilla::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//Dh1->One->SetTargetLocation(GetMesh()->GetBoneLocation(FName("Head_M")) + FVector(30, 30, 30));
+	//Dh1->Two->SetTargetLocation(GetMesh()->GetBoneLocation(FName("Head_M")) + FVector(-30, -30, -30));
 }
 
 float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -153,3 +160,22 @@ void AGodzilla::OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* ot
 	cch->SetCollidingActor(nullptr);
 }
 
+//void  AGodzilla::FDualHandel::HandleOneBoneLock(FName&& BoneName)
+//{
+//	One->GrabComponentAtLocationWithRotation(
+//		Cast<UPrimitiveComponent>(TargetComponent),
+//		NAME_None,
+//		ThisCharacter->GetMesh()->GetBoneLocation(BoneName) + FVector(30, 30, 30),
+//		FRotator(0, 0, 0)
+//	);
+//}
+//
+//void AGodzilla::FDualHandel::HandleTwoBoneLock(FName&& BoneName)
+//{
+//	Two->GrabComponentAtLocationWithRotation(
+//		Cast<UPrimitiveComponent>(TargetComponent),
+//		NAME_None,
+//		ThisCharacter->GetMesh()->GetBoneLocation(BoneName) + FVector(-30, -30, -30),
+//		FRotator(0, 0, 0)
+//	);
+//}

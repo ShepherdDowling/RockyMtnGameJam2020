@@ -106,7 +106,7 @@ void ADefaultGameMode::UpdateHPBars()
     for (int32 i = 0; i < MaxPlayerCount; i++)
     {
         UProgressBar* LifeBar = Cast<UProgressBar>(GodzillaArr[0]->GetHUD()->WidgetTree->FindWidget(HPText[i]));
-        if (LifeBar)
+        if (LifeBar && GodzillaArr[i])
             LifeBar->SetPercent(GodzillaArr[i]->GetHP());
     }
 }
@@ -177,6 +177,8 @@ void ADefaultGameMode::Tick(float DeltaSeconds)
     {
         for (auto player : GodzillaArr)
         {
+            if (!player)
+                continue;
             if (player->GetHP() == 0)
             {
                 GameOver = true;

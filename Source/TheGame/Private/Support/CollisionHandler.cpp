@@ -76,9 +76,6 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 
 		if (CollisionAhead && Y < 0)
 			ThisActor->AddMovementInput(DirectionalRef, Y); // Make movement
-
-		
 	}
-
 }
 

@@ -39,6 +39,8 @@ void AMobileCamera::UpdateCameraLocation()
 	float FurthestActorX = GetFirstPlayerLocation.X;
 	for (ABaseCharacter* BaseCharacter : *BaseCharacterListPtr)
 	{
+		if (!BaseCharacter)
+			continue;
 		auto Location = BaseCharacter->GetActorLocation();
 		TargetLocation += Location;
 		if (ClosestActorX > Location.X)
@@ -102,8 +104,11 @@ void AMobileCamera::LinkCameraAndActors()
 		return;
 
 	for (ABaseCharacter* BaseCharacter : *BaseCharacterListPtr)
+	{
+		if (!BaseCharacter)
+			continue;
 		Cast<APlayerController>(BaseCharacter->GetController())->SetViewTargetWithBlend(this);
-	
+	}
 }
 
 void AMobileCamera::FollowAndSpanPlayers()
