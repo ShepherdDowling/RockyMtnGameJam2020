@@ -86,7 +86,7 @@ void ABaseCharacter::BeginPlay()
 
 	ensure(Animate);
 	ensure(CollisionHandler);
-	CollisionHandler->Init(this, TEXT("TriggerCapsule"));
+	CollisionHandler->Init(this);
 }
 
 // Called every frame

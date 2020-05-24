@@ -21,66 +21,137 @@
 // Sets default values
 UCollisionHandler::UCollisionHandler()
 {
-
+	MeshStrPattern = new FRegexPattern(TEXT(R"(^.*([Mm]esh).*$)"));
 }
 
-void UCollisionHandler::BeginPlay()
+UCollisionHandler::~UCollisionHandler()
 {
-	Super::BeginPlay();
+	if (MeshStrPattern)
+		delete MeshStrPattern;
 }
 
-void UCollisionHandler::Init(ACharacter* thisCharacter, FString&& triggerCapsuleName)
+void UCollisionHandler::Init(ACharacter* thisCharacter)
 {
-	ThisCharacter = thisCharacter;
-	TriggerComponent = ARock::GetActorComponent(ThisCharacter, triggerCapsuleName);
+	Self.Actor = thisCharacter;
+	Self.Mesh = ARock::GetActorComponentByRegex(Self.Actor, *MeshStrPattern); // Default for USkeletalMeshComponent (Character Mesh)
+
+	ensure(Self.Actor);
+	if (!ensure(Self.Mesh))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Has no mesh: %s"), *Self.Actor->GetName());
+	}
+	MeshCompass.ThisCharacter = GetThisCharacter();
 }
 
-UPrimitiveComponent* UCollisionHandler::GetTriggerComponent() const {
-	return TriggerComponent;
+USkeletalMeshComponent* UCollisionHandler::GetMesh() const {
+	return Cast<USkeletalMeshComponent>(Self.Mesh);
 }
 
-void UCollisionHandler::SetCollidingActor(AActor* actor)
+ACharacter* UCollisionHandler::GetThisCharacter() const {
+	return Cast<ACharacter>(Self.Actor);
+}
+
+void UCollisionHandler::SetCollidingActor(AActor* actor) 
 {
-	CollidingActor = actor;
+	if (Other.Actor == actor)
+		return;
+	else if (!actor)
+		return;
+
+	Other.Actor = actor;
+	Other.Mesh = ARock::GetActorComponentByRegex(Other.Actor, *MeshStrPattern);  // Default for USkeletalMeshComponent (Character Mesh)
+	if (!Other.Mesh)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Has no mesh: %s"), *Other.Actor->GetName());
+		Other.Actor = nullptr;
+	}
 }
 
-AActor* UCollisionHandler::GetCollidingActor() const
-{
-	return CollidingActor;
+AActor* UCollisionHandler::GetCollidingActor() const {
+	return Other.Actor;
 }
 
 FVector UCollisionHandler::GetCollisionLocation()
 {
-	return CollidingActor->GetTargetLocation();
+	return Other.Actor->GetTargetLocation();
+}
+
+bool UCollisionHandler::AllClear() const
+{
+	
+	return false;
+}
+
+bool UCollisionHandler::AllBlocked() const
+{
+	return false;
 }
 
 void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X, float Y)
 {
-	// This function is called once at a time from Forward/Right movement
+	if (!(Other.Actor || Other.Mesh))
+		return;
 
-	// Use 4 bone sockets to help your collisions navigate
-	// Front, Back, Left, Right
-	// You can only go into the directions that allow you to move in that direction.
-	
-	if(X > 0)
+	Collision.Front = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Front), Empty.Quat, Empty.Shape);
+	Collision.Back  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Back), Empty.Quat, Empty.Shape);
+	Collision.Left  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Left), Empty.Quat, Empty.Shape);
+	Collision.Right = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Right), Empty.Quat, Empty.Shape);
+
+	if (AllClear())
 	{
-		// unless you are blocked from all directions (like you jumped into the players capsule)
-		// then don't stear into the opponent's collision (limit all left/right movement)
-		true;
+		Other.Actor = nullptr;
 	}
-	else if(Y > 0)
+	else if (AllBlocked())
 	{
-		// Test if the Head_M is overlapping 
-		//	 if yes, then back up
-		// else
-		//   move forward
+		if(Y)
+			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
+		else
+			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+	}
 
-		auto HeadLocation = ThisCharacter->GetMesh()->GetBoneLocation(FName("Head_Socket"));
-		auto CollidingObject = Cast<UCapsuleComponent>(ARock::GetActorComponent(CollidingActor, "TriggerCapsule"));
-		bool CollisionAhead = CollidingObject->OverlapComponent(HeadLocation, Empty.Quat, Empty.Shape);
-
-		if (CollisionAhead && Y < 0)
-			ThisCharacter->AddMovementInput(DirectionalRef, Y); // Make movement
+	if (Collision.Left && X < 0)
+		GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
+	else if (Collision.Right && X > 0)
+		GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
+	else if (Collision.Front && Y < 0)
+		GetThisCharacter()->AddMovementInput(DirectionalRef, Y); // Make movement
+	else if (Collision.Back && Y > 0) 
+		GetThisCharacter()->AddMovementInput(DirectionalRef, Y); // Make movement
+	else{
+		Other.Actor = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("No Collision"));
 	}
 }
+
+bool UCollisionHandler::FCollision::AllClear() const
+{
+	return Front && Back && Left && Right;
+}
+
+bool UCollisionHandler::FCollision::AllBlocked() const
+{
+	return (!Front) && (!Back) && (!Left) && (!Right);
+}
+
+UCollisionHandler::FMeshCompass::FMeshCompass()
+	: Front(FName("Front")), Back(FName("Back")), Left(FName("Left")), Right(FName("Right")) 
+{}
+
+FVector UCollisionHandler::FMeshCompass::GetLocation(ESocket SocketName)
+{
+	switch (SocketName)
+	{
+	case ESocket::Front:
+		return ThisCharacter->GetMesh()->GetBoneLocation(Front);
+	case ESocket::Back:
+		return ThisCharacter->GetMesh()->GetBoneLocation(Back);
+	case ESocket::Left:
+		return ThisCharacter->GetMesh()->GetBoneLocation(Left);
+	case ESocket::Right:
+		return ThisCharacter->GetMesh()->GetBoneLocation(Right);
+	default:
+		return FVector();
+	};
+}
+
 

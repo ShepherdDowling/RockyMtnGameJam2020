@@ -85,8 +85,8 @@ void AGodzilla::BeginPlay()
 	Super::BeginPlay();
 	ensure(Animate);
 
-	CollisionHandler->GetTriggerComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGodzilla::OnCompBeginOverlap);
-	CollisionHandler->GetTriggerComponent()->OnComponentEndOverlap.AddDynamic(this, &AGodzilla::OnCompEndOverlap);
+	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AGodzilla::OnCompBeginOverlap);
+	GetMesh()->OnComponentEndOverlap.AddDynamic(this, &AGodzilla::OnCompEndOverlap);
 	
 	//DualHandle->Init(this, ARock::GetActorComponent(this, TEXT("HeadCapsule")), TEXT("Head_M"));
 }
@@ -144,12 +144,15 @@ float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 
 void AGodzilla::OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
 {
-	auto CollidingCharacter = Cast<ACharacter>(otherActor);
-	if(CollidingCharacter)
-		CollisionHandler->SetCollidingActor(CollidingCharacter);
+
+	UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompBeginOverlap"));
+	if(otherActor)
+		CollisionHandler->SetCollidingActor(otherActor);
+
 }
 
 void AGodzilla::OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompEndOverlap"));
 	CollisionHandler->SetCollidingActor(nullptr);
 }

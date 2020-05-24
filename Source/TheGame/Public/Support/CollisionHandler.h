@@ -13,60 +13,96 @@ class UPrimitiveComponent;
 
 // This Class is used for handling collisions between multple characters
 // and Static (Non-Movable) Meshes
+// This class requires your character have
+//      1. Trigger Capsule
+//      2. four sockets to map out your characters directional state
+//         They must match the names Front, Back, Left, Right
+//      3. Your TriggerCapsule must have an OnComponentBeginOverlap & OnComponentEndOverlap
+//         event to handle what goes on
+//      4. This class requires you leave the default names of Mesh and/or StaticMesh,
+//         for the component names
 UCLASS()
 class THEGAME_API UCollisionHandler : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 private:
-	struct FLocation
-	{
-		struct Directional
-		{
-			FVector Socket;
-			FName Name;
-		};
-		Directional Front;
-		Directional Back;
-		Directional Left;
-		Directional Right;
-	};
 
-	FLocation Location;
+    enum class ESocket
+    {
+        Front,
+        Back,
+        Left,
+        Right
+    };
 
-	ACharacter* ThisCharacter = nullptr;
-	AActor* CollidingActor = nullptr;
-	UPrimitiveComponent* TriggerComponent;
+    struct FCollision
+    {
+        bool Front = false;
+        bool Back = false;
+        bool Left = false;
+        bool Right = false;
+        
+        bool AllClear() const;
+        bool AllBlocked() const;
+    };
+    FCollision Collision;
 
-	struct FEmptyObject
-	{
-		const FQuat Quat;
-		const FCollisionShape Shape;
-		FEmptyObject() : Quat(FQuat()), Shape(FCollisionShape::MakeSphere(1)) {}
-	};
+    struct FMeshCompass
+    {
+        ACharacter* ThisCharacter = nullptr;
+        const FName Front;
+        const FName Back;
+        const FName Left;
+        const FName Right;
+        FMeshCompass();
+        FVector GetLocation(ESocket SocketName);
+    };
+    FMeshCompass MeshCompass;
 
-	FEmptyObject Empty;
+    struct FColliding
+    {
+        AActor* Actor = nullptr;
+        UPrimitiveComponent* Mesh = nullptr;
+    };
+    FColliding Self;
+    FColliding Other;
+
+    struct FEmptyObject
+    {
+        const FQuat Quat;
+        const FCollisionShape Shape;
+        FEmptyObject() : Quat(FQuat()), Shape(FCollisionShape::MakeSphere(55)) {}
+    };
+    FEmptyObject Empty;
+
+    FRegexPattern* MeshStrPattern;
+
 protected:
 
 public:
-	struct FMove
-	{
-		FVector Direction;
-		float Value;
-	};
+    struct FMove
+    {
+        FVector Direction;
+        float Value;
+    };
 
-	enum EDirectionals
-	{
-		ForwardBackward,
-		LeftRight
-	};
-	UCollisionHandler();
-	virtual void BeginPlay() override;
-	void Init(ACharacter* thisCharacter, FString&& TriggerCapsuleName);
+    enum EDirectionals
+    {
+        ForwardBackward,
+        LeftRight
+    };
+    UCollisionHandler();
+    virtual ~UCollisionHandler();
+    void Init(ACharacter* thisCharacter);
 
-	UPrimitiveComponent* GetTriggerComponent() const;
-	void SetCollidingActor(AActor* actor);
-	AActor* GetCollidingActor() const;
-	FVector GetCollisionLocation();
+    USkeletalMeshComponent* GetMesh() const;
+    ACharacter* GetThisCharacter() const;
 
-	void ModifyDirectional(const FVector& DirectionalRef, float X, float Y);
+    void SetCollidingActor(AActor* actor);
+    AActor* GetCollidingActor() const;
+    FVector GetCollisionLocation();
+
+    bool AllClear() const;
+    bool AllBlocked() const;
+    void ModifyDirectional(const FVector& DirectionalRef, float X, float Y);
 };

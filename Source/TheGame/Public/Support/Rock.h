@@ -29,4 +29,7 @@ class ARock : public AActor
 public:
 	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, const FString& Name);
 	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, FString&& Name);
+
+	static UPrimitiveComponent* GetActorComponentByRegex(const AActor* Actor, const FRegexPattern& Regex);
+	static UPrimitiveComponent* GetActorComponentByRegex(const AActor* Actor, FRegexPattern&& Regex);
 };
