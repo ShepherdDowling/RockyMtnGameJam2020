@@ -89,7 +89,7 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	UE_LOG(LogTemp, Warning, TEXT("X,Y: %f	%f"), X, Y);
 	UE_LOG(LogTemp, Warning, TEXT("LOG: DF = %s"), *DirectionalRef.ToString());
 
-	if (/*Self.Actor == Other.Actor ||*/ (!Other.Actor) || (!Other.Mesh))
+	if (Self.Actor == Other.Actor || (!Other.Actor) || (!Other.Mesh))
 		return;
 
 	UE_LOG(LogTemp, Warning, TEXT("LOG: %s: %s"), *FString("started"), *Other.Actor->GetName());
@@ -103,58 +103,40 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 
 	if (Collision.AllClear())
 	{
-		//Other.Actor = nullptr;
+		if (X)
+			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+		else
+			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
 		return;
 	}
 	else if (Collision.AllBlocked())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("LOG: AllBlocked"));
 		if(Y)
 			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
 		else
 			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
-		//Other.Actor = nullptr;
+		Other.Actor = nullptr;
 		return;
 	}
 
-
 	FVector Direction = Self.Actor->GetTransform().GetRotation().GetAxisX(); // Gives X,Y,Z Rotation
-	// Forward (Shared Screen SS) X = 1, Y = 0
 
-	if (FMath::Abs(Direction.X) > 0.5 && Direction.Y > 0) // North
-	{
-		Adjusted = Collision;
-	}else if(Direction.X > 0 && Direction.Y) // South
-
-
-	if (Direction.Y > 0 && FMath::Abs(Direction.X) > 0.5) // North
-	{	// Treat Forward Direction
-		if (Collision.Left && Direction.X > 0)
-			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
-		else if (Collision.Right && Direction.X < 0)
-			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
-		else if (Collision.Front && Direction.Y < 0)
-			GetThisCharacter()->AddMovementInput(DirectionalRef, Y); 
-		else if (Collision.Back && Direction.Y > 0)
-			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("No Collision"));
-		}
-	}
-	else if (false)
-	{
-
-	}
-	else
-	{
+	if (Collision.Left && Direction.X > 0)
+		GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+	else if (Collision.Right && Direction.X < 0)
+		GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+	else if (Collision.Front && Direction.Y > 0) // Remember Reverse Y
+		GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
+	else if (Collision.Back && Direction.Y < 0) // Remember Reverse Y
+		GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
+	else {
 		if (X)
 			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
 		else
-			GetThisCharacter()->AddMovementInput(DirectionalRef, Y); 
+			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
+		UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("No Collision"));
 	}
-
-	// TODO: UNCOMMENT THIS
-	//if(!GetThisCharacter()->GetMesh()->IsOverlappingActor(Other.Actor))
-	//	Other.Actor = nullptr;
 }
 
 void UCollisionHandler::FCollision::operator=(const FCollision& Other)

@@ -61,11 +61,11 @@ void ADefaultGameMode::LockSharedCamera()
         FActorSpawnParameters vMobileCameraSpawnParams;
         vMobileCameraSpawnParams.Owner = this;
 
-        auto vCamLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTargetLocation();// +FVector(-300, 0, 300);
+        auto vCamLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTargetLocation();
         // minus to make the camera go back behind the player
         // 0 to stay inline with the player
         // plus to get an arial view of the player
-        auto vCamRotation = FRotator(0, 0, -40); // 40 degree pitch
+        auto vCamRotation = FRotator(0, 0, -35); // Look down at a 35 degree angle
 
         MobileCamera = GetWorld()->SpawnActor<AMobileCamera>(AMobileCamera::StaticClass(),
             vCamLocation, vCamRotation, vMobileCameraSpawnParams);

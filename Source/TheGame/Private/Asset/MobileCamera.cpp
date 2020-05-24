@@ -87,7 +87,7 @@ AMobileCamera::AMobileCamera()
 	Camera->SetHiddenInGame(false);
 
 	SpringArm->bDoCollisionTest = false;
-	SetActorRotation(FRotator(0, -90, 0));
+	SetActorRotation(FRotator(0, -90, 0)); // Twists our camera to look -Y
 }
 
 void AMobileCamera::Tick(float DeltaTime)

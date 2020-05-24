@@ -130,7 +130,34 @@ void ABaseCharacter::OnResetVR()
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
+
 void ABaseCharacter::MoveForward(float Value)
+{
+	if (!Animate) return;
+	if (!CollisionHandler) return;
+	if (!Animate->RunningBlueprint()) return;
+
+	Value = -Value; // Because we look Down (So on the viewport, Z doesn't overlap Y)
+	if ((Controller != NULL) && (Value != 0.0f))
+	{
+		// find out which way is right
+		const FRotator Rotation = FRotator(0, 0, 0); // Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get right vector 
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// add movement in that direction (value -1 = left, value +1 = right (hence move right to what extent)
+
+		if (!CollisionHandler->GetCollidingActor())
+			AddMovementInput(Direction, Value);
+		else {
+			CollisionHandler->ModifyDirectional(Direction, Value, 0); // X/Y axis
+		}
+	}
+}
+
+
+void ABaseCharacter::MoveRight(float Value)
 {
 	if (!Animate) return;
 	if (!CollisionHandler) return;
@@ -149,30 +176,6 @@ void ABaseCharacter::MoveForward(float Value)
 			AddMovementInput(Direction, Value);
 		else 
 			CollisionHandler->ModifyDirectional(Direction, 0, Value); // X/Y axis
-	}
-}
-
-void ABaseCharacter::MoveRight(float Value)
-{
-	if (!Animate) return;
-	if (!CollisionHandler) return;
-	if (!Animate->RunningBlueprint()) return;
-
-	if ((Controller != NULL) && (Value != 0.0f))
-	{
-		// find out which way is right
-		const FRotator Rotation = FRotator(0, 0, 0); // Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y); 
-		// add movement in that direction (value -1 = left, value +1 = right (hence move right to what extent)
-
-		if (!CollisionHandler->GetCollidingActor())
-			AddMovementInput(Direction, Value);
-		else {
-			CollisionHandler->ModifyDirectional(Direction, Value, 0); // X/Y axis
-		}
 	}
 }
 
