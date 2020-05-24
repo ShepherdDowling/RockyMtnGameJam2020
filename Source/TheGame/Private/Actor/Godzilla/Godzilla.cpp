@@ -39,38 +39,38 @@
 // Called to bind functionality to input
 void AGodzilla::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAction(TEXT("TailWhip"), IE_Pressed, this, &AGodzilla::TailWhip);
-	PlayerInputComponent->BindAction(TEXT("Bite"), IE_Pressed, this, &AGodzilla::Bite);
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+    PlayerInputComponent->BindAction(TEXT("TailWhip"), IE_Pressed, this, &AGodzilla::TailWhip);
+    PlayerInputComponent->BindAction(TEXT("Bite"), IE_Pressed, this, &AGodzilla::Bite);
 }
 
 
 void AGodzilla::TailWhip()
 {
-	Animate->Animate(TEXT("Attack/TailWhip/TailWhipMT"), true);
+    Animate->Animate(TEXT("Attack/TailWhip/TailWhipMT"), true);
 }
 
 void AGodzilla::Bite()
 {
-	Animate->Animate(TEXT("Attack/Bite/BiteMT"), true);
+    Animate->Animate(TEXT("Attack/Bite/BiteMT"), true);
 }
 
 
 // Sets default values
 AGodzilla::AGodzilla()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	SetActorTickEnabled(true);
-	ensure(Animate);
-	UAnimate::SetHome(TEXT("/Game/_Actors/Godzilla/Animations"));
-	Animate->SetActor(Cast<ABaseCharacter>(this));
+    // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
+    SetActorTickEnabled(true);
+    ensure(Animate);
+    UAnimate::SetHome(TEXT("/Game/_Actors/Godzilla/Animations"));
+    Animate->SetActor(Cast<ABaseCharacter>(this));
 
-	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/TailWhip/TailWhipMT")));
-	Animate->Add(UAnimate::NewAnimation(TEXT("Attack/Bite/BiteMT")));
-	Animate->Add(UAnimate::NewAnimation(TEXT("Movement/Die")));
+    Animate->Add(UAnimate::NewAnimation(TEXT("Attack/TailWhip/TailWhipMT")));
+    Animate->Add(UAnimate::NewAnimation(TEXT("Attack/Bite/BiteMT")));
+    Animate->Add(UAnimate::NewAnimation(TEXT("Movement/Die")));
 
-	//DualHandle = CreateDefaultSubobject<UDualHandle>("DualHandle");
+    //DualHandle = CreateDefaultSubobject<UDualHandle>("DualHandle");
 }
 
 
@@ -82,77 +82,78 @@ AGodzilla::~AGodzilla()
 // Called when the game starts or when spawned
 void AGodzilla::BeginPlay()
 {
-	Super::BeginPlay();
-	ensure(Animate);
+    Super::BeginPlay();
+    ensure(Animate);
 
-	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AGodzilla::OnCompBeginOverlap);
-	GetMesh()->OnComponentEndOverlap.AddDynamic(this, &AGodzilla::OnCompEndOverlap);
-	
-	//DualHandle->Init(this, ARock::GetActorComponent(this, TEXT("HeadCapsule")), TEXT("Head_M"));
+    GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AGodzilla::OnCompBeginOverlap);
+    GetMesh()->OnComponentEndOverlap.AddDynamic(this, &AGodzilla::OnCompEndOverlap);
+
+    //DualHandle->Init(this, ARock::GetActorComponent(this, TEXT("HeadCapsule")), TEXT("Head_M"));
 }
 
 // Called every frame
 void AGodzilla::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-	//DualHandle->UpdateGrip();
+    Super::Tick(DeltaTime);
+    //DualHandle->UpdateGrip();
+    
+    //UE_LOG(LogTemp, Warning, TEXT("GetAxisZ: %s"), *this->GetTransform().GetRotation().GetAxisX().ToString());
 }
 
 float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	bool bDoDamage = false;
-	if (!ensure(EventInstigator)) return 0;
+    bool bDoDamage = false;
+    if (!ensure(EventInstigator)) return 0;
 
-	ABaseCharacter* GP = Cast<ABaseCharacter>(EventInstigator->GetPawn());
+    ABaseCharacter* GP = Cast<ABaseCharacter>(EventInstigator->GetPawn());
 
-	if (!GP)
-		bDoDamage = true;
-	else if (GP->GetFName() != GetFName())  // we don't apply damage to ourself if radial damage is used
-	{
-		if (!OpponentDamageTrackMap.Contains(GP->GetFName()))
-		{
-			bDoDamage = true;
-			OpponentDamageTrackMap.Add(GP->GetFName(), GP->GetTotalAnimationsPlayed());
-		}
-		else
-		{
-			if (OpponentDamageTrackMap[GP->GetFName()] != GP->GetTotalAnimationsPlayed())
-			{
-				OpponentDamageTrackMap[GP->GetFName()] = GP->GetTotalAnimationsPlayed();
-				bDoDamage = true;
-			}
-		}
-	}
+    if (!GP)
+        bDoDamage = true;
+    else if (GP->GetFName() != GetFName())  // we don't apply damage to ourself if radial damage is used
+    {
+        if (!OpponentDamageTrackMap.Contains(GP->GetFName()))
+        {
+            bDoDamage = true;
+            OpponentDamageTrackMap.Add(GP->GetFName(), GP->GetTotalAnimationsPlayed());
+        }
+        else
+        {
+            if (OpponentDamageTrackMap[GP->GetFName()] != GP->GetTotalAnimationsPlayed())
+            {
+                OpponentDamageTrackMap[GP->GetFName()] = GP->GetTotalAnimationsPlayed();
+                bDoDamage = true;
+            }
+        }
+    }
 
-	if (!bDoDamage)
-		return 0;
+    if (!bDoDamage)
+        return 0;
 
-	int32 RoundedDamagePoints = FPlatformMath::RoundToInt(DamageAmount);
-	int32 DamageToApply = FMath::Clamp<int32>(RoundedDamagePoints, 0, Health.Current);
-	Health.Current -= DamageToApply;
+    int32 RoundedDamagePoints = FPlatformMath::RoundToInt(DamageAmount);
+    int32 DamageToApply = FMath::Clamp<int32>(RoundedDamagePoints, 0, Health.Current);
+    Health.Current -= DamageToApply;
 
-	if (Health.Current <= 0) 
-	{
-		Animate->Animate("Movement/Die");
-		OnDeath.Broadcast();
-	}
+    if (Health.Current <= 0)
+    {
+        Animate->Animate("Movement/Die");
+        OnDeath.Broadcast();
+    }
 
-	// TODO: GODZILLA FALLS BACKWARDS
-	//Animate->Animate(TEXT("Ninja/Fall/Backwards"), true, true);
-	return DamageToApply;
+    // TODO: GODZILLA FALLS BACKWARDS
+    //Animate->Animate(TEXT("Ninja/Fall/Backwards"), true, true);
+    return DamageToApply;
 }
 
 void AGodzilla::OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
 {
-
-	UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompBeginOverlap"));
-	if(otherActor)
-		CollisionHandler->SetCollidingActor(otherActor);
-
+    UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompBeginOverlap"));
+    CollisionHandler->SetCollidingActor(otherActor);
 }
 
 void AGodzilla::OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompEndOverlap"));
-	CollisionHandler->SetCollidingActor(nullptr);
+    //UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompEndOverlap"));
+    /// TODO: UNCOMMENT THIS
+    //if (this != otherActor) 
+        //CollisionHandler->SetCollidingActor(nullptr);
 }

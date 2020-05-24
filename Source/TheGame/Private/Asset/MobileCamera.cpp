@@ -34,22 +34,22 @@ void AMobileCamera::UpdateCameraLocation()
 	// TODO: Update this so it works with more than 2 players
 	TargetLocation = FVector(0, 0, 0);
 
-	float ClosestActorX = GetFirstPlayerLocation.X;
-	float FurthestActorX = GetFirstPlayerLocation.X;
+	float ClosestActorY = GetFirstPlayerLocation.Y;
+	float FurthestActorY = GetFirstPlayerLocation.Y;
 	for (ABaseCharacter* BaseCharacter : *BaseCharacterListPtr)
 	{
 		if (!BaseCharacter)
 			continue;
 		auto Location = BaseCharacter->GetActorLocation();
 		TargetLocation += Location;
-		if (ClosestActorX > Location.X)
-			ClosestActorX = Location.X;
+		if (ClosestActorY > Location.Y)
+			ClosestActorY = Location.Y;
 
-		if (FurthestActorX < Location.X)
-			FurthestActorX = Location.X;
+		if (FurthestActorY < Location.Y)
+			FurthestActorY = Location.Y;
 	}
 	TargetLocation /= GameModePtr->GetMaxPlayerCount();
-	TargetLocation.X -= ((FurthestActorX - ClosestActorX) * 0.2);
+	TargetLocation.Y += ((FurthestActorY - ClosestActorY) * 0.2);
 
 	// SetActorLocation(FMath::VInterpTo(GetActorLocation(), TargetLocation, GetWorld()->GetDeltaSeconds(), .02));
 	SetActorLocation(TargetLocation);
@@ -73,14 +73,21 @@ AMobileCamera::AMobileCamera()
 
 	DefaultScene = CreateDefaultSubobject<USceneComponent>(FName("DefaultScene"));
 	SetRootComponent(DefaultScene);
+	DefaultScene->SetVisibility(true);
+	DefaultScene->SetHiddenInGame(false);
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(FName("SpringArm"));
 	SpringArm->AttachToComponent(DefaultScene, FAttachmentTransformRules::KeepRelativeTransform);
+	SpringArm->SetVisibility(true);
+	SpringArm->SetHiddenInGame(false);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(FName("Camera"));
 	Camera->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepRelativeTransform);
+	Camera->SetVisibility(true);
+	Camera->SetHiddenInGame(false);
 
 	SpringArm->bDoCollisionTest = false;
+	SetActorRotation(FRotator(0, -90, 0));
 }
 
 void AMobileCamera::Tick(float DeltaTime)
@@ -94,6 +101,7 @@ void AMobileCamera::AddReferences(ADefaultGameMode* iGameModePtr, TArray<AActor*
 	GameModePtr = iGameModePtr;
 	PlayerStartsPtr = iPlayerStartsPtr;
 	BaseCharacterListPtr = iBaseCharacterListPtr;
+
 }
 
 

@@ -145,7 +145,6 @@ void ABaseCharacter::MoveForward(float Value)
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		AddMovementInput(Direction, Value);
 		if (!CollisionHandler->GetCollidingActor())
 			AddMovementInput(Direction, Value);
 		else 

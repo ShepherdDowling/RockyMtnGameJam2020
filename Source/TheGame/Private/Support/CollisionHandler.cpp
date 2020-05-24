@@ -15,6 +15,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/ArrowComponent.h"
 
 #include "Engine/World.h" 
 
@@ -76,51 +77,92 @@ FVector UCollisionHandler::GetCollisionLocation()
 	return Other.Actor->GetTargetLocation();
 }
 
-bool UCollisionHandler::AllClear() const
-{
-	
-	return false;
-}
-
-bool UCollisionHandler::AllBlocked() const
-{
-	return false;
-}
-
 void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X, float Y)
 {
-	if (!(Other.Actor || Other.Mesh))
+	// Note: Only X or Y will have a value.
+	// That means that either X or Y will equal 0
+	// If you are using a controller, you will fire both with the stick (but seperatly),
+	// unless you are directly UP/Down/Left/Right
+
+	UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("============================="));
+
+	UE_LOG(LogTemp, Warning, TEXT("X,Y: %f	%f"), X, Y);
+	UE_LOG(LogTemp, Warning, TEXT("LOG: DF = %s"), *DirectionalRef.ToString());
+
+	if (/*Self.Actor == Other.Actor ||*/ (!Other.Actor) || (!Other.Mesh))
 		return;
 
+	UE_LOG(LogTemp, Warning, TEXT("LOG: %s: %s"), *FString("started"), *Other.Actor->GetName());
+
 	Collision.Front = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Front), Empty.Quat, Empty.Shape);
-	Collision.Back  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Back), Empty.Quat, Empty.Shape);
-	Collision.Left  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Left), Empty.Quat, Empty.Shape);
+	Collision.Back  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Back),  Empty.Quat, Empty.Shape);
+	Collision.Left  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Left),  Empty.Quat, Empty.Shape);
 	Collision.Right = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Right), Empty.Quat, Empty.Shape);
 
-	if (AllClear())
+	UE_LOG(LogTemp, Warning, TEXT("LOG: %d	%d	%d	%d"), Collision.Front, Collision.Back, Collision.Left, Collision.Right);
+
+	if (Collision.AllClear())
 	{
-		Other.Actor = nullptr;
+		//Other.Actor = nullptr;
+		return;
 	}
-	else if (AllBlocked())
+	else if (Collision.AllBlocked())
 	{
 		if(Y)
 			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
 		else
 			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+		//Other.Actor = nullptr;
+		return;
 	}
 
-	if (Collision.Left && X < 0)
-		GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-	else if (Collision.Right && X > 0)
-		GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-	else if (Collision.Front && Y < 0)
-		GetThisCharacter()->AddMovementInput(DirectionalRef, Y); // Make movement
-	else if (Collision.Back && Y > 0) 
-		GetThisCharacter()->AddMovementInput(DirectionalRef, Y); // Make movement
-	else{
-		Other.Actor = nullptr;
-		UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("No Collision"));
+
+	FVector Direction = Self.Actor->GetTransform().GetRotation().GetAxisX(); // Gives X,Y,Z Rotation
+	// Forward (Shared Screen SS) X = 1, Y = 0
+
+	if (FMath::Abs(Direction.X) > 0.5 && Direction.Y > 0) // North
+	{
+		Adjusted = Collision;
+	}else if(Direction.X > 0 && Direction.Y) // South
+
+
+	if (Direction.Y > 0 && FMath::Abs(Direction.X) > 0.5) // North
+	{	// Treat Forward Direction
+		if (Collision.Left && Direction.X > 0)
+			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+		else if (Collision.Right && Direction.X < 0)
+			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+		else if (Collision.Front && Direction.Y < 0)
+			GetThisCharacter()->AddMovementInput(DirectionalRef, Y); 
+		else if (Collision.Back && Direction.Y > 0)
+			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("No Collision"));
+		}
 	}
+	else if (false)
+	{
+
+	}
+	else
+	{
+		if (X)
+			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+		else
+			GetThisCharacter()->AddMovementInput(DirectionalRef, Y); 
+	}
+
+	// TODO: UNCOMMENT THIS
+	//if(!GetThisCharacter()->GetMesh()->IsOverlappingActor(Other.Actor))
+	//	Other.Actor = nullptr;
+}
+
+void UCollisionHandler::FCollision::operator=(const FCollision& Other)
+{
+	Front = Other.Front;
+	Back = Other.Back;
+	Left = Other.Left;
+	Right = Other.Right;
 }
 
 bool UCollisionHandler::FCollision::AllClear() const
@@ -142,13 +184,13 @@ FVector UCollisionHandler::FMeshCompass::GetLocation(ESocket SocketName)
 	switch (SocketName)
 	{
 	case ESocket::Front:
-		return ThisCharacter->GetMesh()->GetBoneLocation(Front);
+		return ThisCharacter->GetMesh()->GetSocketLocation(Front);
 	case ESocket::Back:
-		return ThisCharacter->GetMesh()->GetBoneLocation(Back);
+		return ThisCharacter->GetMesh()->GetSocketLocation(Back);
 	case ESocket::Left:
-		return ThisCharacter->GetMesh()->GetBoneLocation(Left);
+		return ThisCharacter->GetMesh()->GetSocketLocation(Left);
 	case ESocket::Right:
-		return ThisCharacter->GetMesh()->GetBoneLocation(Right);
+		return ThisCharacter->GetMesh()->GetSocketLocation(Right);
 	default:
 		return FVector();
 	};

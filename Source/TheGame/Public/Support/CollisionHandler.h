@@ -41,11 +41,13 @@ private:
         bool Back = false;
         bool Left = false;
         bool Right = false;
-        
+
+        void operator=(const FCollision& Other);
         bool AllClear() const;
         bool AllBlocked() const;
     };
     FCollision Collision;
+    FCollision Adjusted;
 
     struct FMeshCompass
     {
@@ -54,6 +56,7 @@ private:
         const FName Back;
         const FName Left;
         const FName Right;
+
         FMeshCompass();
         FVector GetLocation(ESocket SocketName);
     };
@@ -102,7 +105,5 @@ public:
     AActor* GetCollidingActor() const;
     FVector GetCollisionLocation();
 
-    bool AllClear() const;
-    bool AllBlocked() const;
     void ModifyDirectional(const FVector& DirectionalRef, float X, float Y);
 };
