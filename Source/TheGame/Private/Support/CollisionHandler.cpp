@@ -98,46 +98,93 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	Collision.Back  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Back),  Empty.Quat, Empty.Shape);
 	Collision.Left  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Left),  Empty.Quat, Empty.Shape);
 	Collision.Right = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Right), Empty.Quat, Empty.Shape);
+	Free = Collision.Reverse();
 
 	UE_LOG(LogTemp, Warning, TEXT("LOG: %d	%d	%d	%d"), Collision.Front, Collision.Back, Collision.Left, Collision.Right);
 
-	if (Collision.AllClear())
+	FMovement Move(X, Y, GetThisCharacter(), &DirectionalRef);
+
+	if (Collision.AllClear() || Collision.AllBlocked())
 	{
-		if (X)
-			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
-		else
-			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-		return;
-	}
-	else if (Collision.AllBlocked())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("LOG: AllBlocked"));
-		if(Y)
-			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-		else
-			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
-		Other.Actor = nullptr;
+		Move.Character();
 		return;
 	}
 
-	FVector Direction = Self.Actor->GetTransform().GetRotation().GetAxisX(); // Gives X,Y,Z Rotation
+	FDirection Facing(Self.Actor->GetTransform().GetRotation().GetAxisX()); // Gives X,Y,Z Rotation
+	UE_LOG(LogTemp, Warning, TEXT("LOG: Direction = %s"), *Facing.Vec.ToString());
 
-	if (Collision.Left && Direction.X > 0)
-		GetThisCharacter()->AddMovementInput(DirectionalRef, X);
-	else if (Collision.Right && Direction.X < 0)
-		GetThisCharacter()->AddMovementInput(DirectionalRef, X);
-	else if (Collision.Front && Direction.Y > 0) // Remember Reverse Y
-		GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-	else if (Collision.Back && Direction.Y < 0) // Remember Reverse Y
-		GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-	else {
+	if (FMath::RoundToInt(X) == FMath::RoundToInt(Facing.Vec.X) || FMath::RoundToInt(Y) == FMath::RoundToInt(Facing.Vec.Y))
+	{
 		if (X)
-			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
-		else
-			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-		UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("No Collision"));
+		{
+			
+			
+		}
+		else // Y
+		{
+
+		}
 	}
+	else 
+	{
+		if (Y)
+			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
+		else
+			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+	}
+
 }
+// --------------------------------------------------------------------------------------------------------------------------------------------
+UCollisionHandler::FMovement::FMovement(float iX, float iY, ACharacter* iThisCharacter, const FVector* iDirectionalRefPtr)
+	: X(iX), Y(iY), ThisCharacter(iThisCharacter), DirectionalRefPtr(iDirectionalRefPtr)
+{
+}
+
+bool UCollisionHandler::FMovement::Up() const {
+	return Y < 0;
+}
+
+bool UCollisionHandler::FMovement::Down() const {
+	return Y > 0;
+}
+
+bool UCollisionHandler::FMovement::Left() const {
+	return X < 0;
+}
+
+bool UCollisionHandler::FMovement::Right() const {
+	return X > 0;
+}
+
+void UCollisionHandler::FMovement::Character()
+{
+	if (Y)
+		ThisCharacter->AddMovementInput(*DirectionalRefPtr, Y);
+	else
+		ThisCharacter->AddMovementInput(*DirectionalRefPtr, X);
+}
+// --------------------------------------------------------------------------------------------------------------------------------------------
+UCollisionHandler::FDirection::FDirection(FVector&& iVector)
+	: Vec(iVector)
+{
+}
+
+bool UCollisionHandler::FDirection::Up() const {
+	return Vec.Y < 0;
+}
+
+bool UCollisionHandler::FDirection::Down() const {
+	return Vec.Y > 0;
+}
+
+bool UCollisionHandler::FDirection::Left() const {
+	return Vec.X < 0;
+}
+
+bool UCollisionHandler::FDirection::Right() const {
+	return Vec.X > 0;
+}
+
 
 void UCollisionHandler::FCollision::operator=(const FCollision& Other)
 {
@@ -157,6 +204,16 @@ bool UCollisionHandler::FCollision::AllBlocked() const
 	return (!Front) && (!Back) && (!Left) && (!Right);
 }
 
+UCollisionHandler::FCollision UCollisionHandler::FCollision::Reverse() const
+{
+	FCollision Rev;
+	Rev.Front = !Front;
+	Rev.Back  = !Back;
+	Rev.Left  = !Left;
+	Rev.Right = !Right;
+	return Rev;
+}
+// --------------------------------------------------------------------------------------------------------------------------------------------
 UCollisionHandler::FMeshCompass::FMeshCompass()
 	: Front(FName("Front")), Back(FName("Back")), Left(FName("Left")), Right(FName("Right")) 
 {}
@@ -177,5 +234,4 @@ FVector UCollisionHandler::FMeshCompass::GetLocation(ESocket SocketName)
 		return FVector();
 	};
 }
-
-
+// --------------------------------------------------------------------------------------------------------------------------------------------

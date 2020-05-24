@@ -26,6 +26,30 @@ class THEGAME_API UCollisionHandler : public UActorComponent
 {
     GENERATED_BODY()
 private:
+    struct FDirection
+    {
+        const FVector Vec;
+        FDirection(FVector&& iVector);
+        bool Up() const;
+        bool Down() const;
+        bool Left() const;
+        bool Right() const;
+    };
+
+    struct FMovement
+    {
+        ACharacter* ThisCharacter = nullptr;
+        const FVector* DirectionalRefPtr = nullptr;
+        const float X = 0;
+        const float Y = 0;
+
+        FMovement(float iX, float iY, ACharacter* iThisCharacter, const FVector* iDirectionalRefPtr);
+        bool Up() const;
+        bool Down() const;
+        bool Left() const;
+        bool Right() const;
+        void Character();
+    };
 
     enum class ESocket
     {
@@ -45,9 +69,11 @@ private:
         void operator=(const FCollision& Other);
         bool AllClear() const;
         bool AllBlocked() const;
+        FCollision Reverse() const;
     };
+    
     FCollision Collision;
-    FCollision Adjusted;
+    FCollision Free;
 
     struct FMeshCompass
     {
@@ -77,7 +103,6 @@ private:
         FEmptyObject() : Quat(FQuat()), Shape(FCollisionShape::MakeSphere(55)) {}
     };
     FEmptyObject Empty;
-
     FRegexPattern* MeshStrPattern;
 
 protected:

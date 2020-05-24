@@ -96,9 +96,7 @@ void AGodzilla::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
     //DualHandle->UpdateGrip();
-    
-    UE_LOG(LogTemp, Warning, TEXT("GetAxisZ: %s"), *this->GetTransform().GetRotation().GetAxisX().ToString());
-}
+    }
 
 float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -152,7 +150,7 @@ void AGodzilla::OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* 
 
 void AGodzilla::OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-    //UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompEndOverlap"));
+    UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompEndOverlap"));
     if (this != otherActor) 
         CollisionHandler->SetCollidingActor(nullptr);
 }

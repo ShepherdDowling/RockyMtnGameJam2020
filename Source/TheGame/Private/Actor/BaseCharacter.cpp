@@ -151,7 +151,7 @@ void ABaseCharacter::MoveForward(float Value)
 		if (!CollisionHandler->GetCollidingActor())
 			AddMovementInput(Direction, Value);
 		else {
-			CollisionHandler->ModifyDirectional(Direction, Value, 0); // X/Y axis
+			CollisionHandler->ModifyDirectional(Direction, 0, Value); // X/Y axis
 		}
 	}
 }
@@ -175,7 +175,7 @@ void ABaseCharacter::MoveRight(float Value)
 		if (!CollisionHandler->GetCollidingActor())
 			AddMovementInput(Direction, Value);
 		else 
-			CollisionHandler->ModifyDirectional(Direction, 0, Value); // X/Y axis
+			CollisionHandler->ModifyDirectional(Direction, Value, 0); // X/Y axis
 	}
 }
 
