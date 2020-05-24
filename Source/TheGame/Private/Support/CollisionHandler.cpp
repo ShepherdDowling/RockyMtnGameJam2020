@@ -118,7 +118,6 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 		if (X)
 		{
 			
-			
 		}
 		else // Y
 		{
