@@ -86,13 +86,9 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 
 	UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("============================="));
 
-	UE_LOG(LogTemp, Warning, TEXT("X,Y: %f	%f"), X, Y);
-	UE_LOG(LogTemp, Warning, TEXT("LOG: DF = %s"), *DirectionalRef.ToString());
-
 	if (Self.Actor == Other.Actor || (!Other.Actor) || (!Other.Mesh))
 		return;
 
-	UE_LOG(LogTemp, Warning, TEXT("LOG: %s: %s"), *FString("started"), *Other.Actor->GetName());
 
 	Collision.Front = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Front), Empty.Quat, Empty.Shape);
 	Collision.Back  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Back),  Empty.Quat, Empty.Shape);
@@ -100,38 +96,118 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	Collision.Right = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Right), Empty.Quat, Empty.Shape);
 	Free = Collision.Reverse();
 
-	UE_LOG(LogTemp, Warning, TEXT("LOG: %d	%d	%d	%d"), Collision.Front, Collision.Back, Collision.Left, Collision.Right);
 
 	FMovement Move(X, Y, GetThisCharacter(), &DirectionalRef);
 
 	if (Collision.AllClear() || Collision.AllBlocked())
-	{
-		Move.Character();
-		return;
-	}
+		return Move.Character();
+	
 
-	FDirection Facing(Self.Actor->GetTransform().GetRotation().GetAxisX()); // Gives X,Y,Z Rotation
-	UE_LOG(LogTemp, Warning, TEXT("LOG: Direction = %s"), *Facing.Vec.ToString());
+	FDirection Facing(Self.Actor->GetTransform().GetRotation().GetAxisX());
+	UE_LOG(LogTemp, Warning, TEXT("---------- U  D  L  R"));
+	UE_LOG(LogTemp, Warning, TEXT("Collision: %d  %d  %d  %d"), Collision.Front, Collision.Back, Collision.Left, Collision.Right);
+	UE_LOG(LogTemp, Warning, TEXT("Facing:    %d  %d  %d  %d"), Facing.Up(), Facing.Down(), Facing.Left(), Facing.Right());
+	UE_LOG(LogTemp, Warning, TEXT("Moving:    %d  %d  %d  %d"), Move.Up(), Move.Down(), Move.Left(), Move.Right());
 
-	if (FMath::RoundToInt(X) == FMath::RoundToInt(Facing.Vec.X) || FMath::RoundToInt(Y) == FMath::RoundToInt(Facing.Vec.Y))
+	// Easy way to calculate.
+	// If you have a collision on the right, you are probably free on the left (because characters don't wrap-around)
+	// So if you are facing forward, you have a collision to your right, you should be able to go left
+
+	UE_LOG(LogTemp, Warning, TEXT("Rounded:   %d  %d  %d  %d"), FMath::RoundToInt(X), FMath::RoundToInt(Facing.Vec.X), FMath::RoundToInt(Y), FMath::RoundToInt(Facing.Vec.Y));
+	//if ((FMath::RoundToInt(X) == FMath::RoundToInt(Facing.Vec.X) || FMath::RoundToInt(Y) == FMath::RoundToInt(Facing.Vec.Y)))
+	//{
+	//	// If I am moving in a forward direction (direction that I am facing), the collision must be at the front if there is one
+	//	if (Free.Front)
+	//		return Move.Character();
+
+	//	UE_LOG(LogTemp, Warning, TEXT("LOG: Front Facing"));
+	//}
+
+	if (Facing.Up())
 	{
-		if (X)
+		UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 0);
+		// Move where the collision is NOT
+		if (
+			   ((!Collision.Front) && Move.Up())
+			|| ((!Collision.Back)  && Move.Down())
+			|| ((!Collision.Left)  && Move.Left())
+			|| ((!Collision.Right) && Move.Right())
+			)
 		{
-			
-		}
-		else // Y
-		{
-
+			return Move.Character();
 		}
 	}
-	else 
+	else if (Facing.Down())
 	{
-		if (Y)
-			GetThisCharacter()->AddMovementInput(DirectionalRef, Y);
-		else
-			GetThisCharacter()->AddMovementInput(DirectionalRef, X);
+		UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 1);
+		// Move where the collision is (mirrored)
+		if
+			(
+				   (Collision.Back  && Move.Up())
+				|| (Collision.Front && Move.Down()) 
+				|| (Collision.Left  && Move.Left())
+				|| (Collision.Right && Move.Right())
+				)
+		{
+			return Move.Character();
+		}
+		else if
+			(
+				   (Free.Left  && Move.Right())
+				|| (Free.Right && Move.Left())
+				|| (Free.Back  && Move.Up())
+				|| (Free.Front && Move.Down())
+				)
+		{
+			return Move.Character();
+		}
+	}
+	else if (Facing.Left())
+	{
+		if (
+			   (Move.Up()    && (!Collision.Right))
+			|| (Move.Down()  && (!Collision.Left))
+			|| (Move.Left()  && (!Collision.Front))
+			|| (Move.Right() && (!Collision.Back))
+			)
+		{
+			return Move.Character();
+		}
+	}
+	else if (Facing.Right())
+	{
+		if (
+			   (Move.Up()    && (!Collision.Left))
+			|| (Move.Down()  && (!Collision.Right))
+			|| (Move.Left()  && (!Collision.Back))
+			|| (Move.Right() && (!Collision.Front))
+			)
+		{
+			return Move.Character();
+		}
 	}
 
+	//if (X)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 3);
+	//	if ((Free.Left && Free.Right) && (Facing.Up() || Facing.Down()))
+	//		return Move.Character();
+	//	else if ((Free.Front && Free.Back) && (Facing.Left() || Facing.Right()))
+	//		return Move.Character();
+
+	//	UE_LOG(LogTemp, Warning, TEXT("LOG: X"));
+	//}
+	//else // Y
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 4);
+	//	if ((Free.Front && Free.Back) && (Facing.Up() || Facing.Down()))
+	//		return Move.Character();
+	//	else if ((Free.Left && Free.Right) && (Facing.Left() || Facing.Right()))
+	//		return Move.Character();
+
+	//	UE_LOG(LogTemp, Warning, TEXT("LOG: Y"));
+	//}
+	
 }
 // --------------------------------------------------------------------------------------------------------------------------------------------
 UCollisionHandler::FMovement::FMovement(float iX, float iY, ACharacter* iThisCharacter, const FVector* iDirectionalRefPtr)
@@ -140,19 +216,19 @@ UCollisionHandler::FMovement::FMovement(float iX, float iY, ACharacter* iThisCha
 }
 
 bool UCollisionHandler::FMovement::Up() const {
-	return Y < 0;
+	return Y < -0.00001;
 }
 
 bool UCollisionHandler::FMovement::Down() const {
-	return Y > 0;
+	return Y > 0.00001;
 }
 
 bool UCollisionHandler::FMovement::Left() const {
-	return X < 0;
+	return X < -0.00001;
 }
 
 bool UCollisionHandler::FMovement::Right() const {
-	return X > 0;
+	return X > 0.00001;
 }
 
 void UCollisionHandler::FMovement::Character()
@@ -169,19 +245,19 @@ UCollisionHandler::FDirection::FDirection(FVector&& iVector)
 }
 
 bool UCollisionHandler::FDirection::Up() const {
-	return Vec.Y < 0;
+	return Vec.Y < -0.00001;
 }
 
 bool UCollisionHandler::FDirection::Down() const {
-	return Vec.Y > 0;
+	return Vec.Y > 0.00001;
 }
 
 bool UCollisionHandler::FDirection::Left() const {
-	return Vec.X < 0;
+	return Vec.X < -0.00001;
 }
 
 bool UCollisionHandler::FDirection::Right() const {
-	return Vec.X > 0;
+	return Vec.X > 0.00001;
 }
 
 
