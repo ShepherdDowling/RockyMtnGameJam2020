@@ -143,8 +143,8 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 		// Move where the collision is (mirrored)
 		if
 			(
-				   (Collision.Back  && Move.Up())
-				|| (Collision.Front && Move.Down()) 
+				   (Collision.Back  && Move.Down())
+				|| (Collision.Front && Move.Up())
 				|| (Collision.Left  && Move.Left())
 				|| (Collision.Right && Move.Right())
 				)
@@ -245,19 +245,19 @@ UCollisionHandler::FDirection::FDirection(FVector&& iVector)
 }
 
 bool UCollisionHandler::FDirection::Up() const {
-	return Vec.Y < -0.00001;
+	return Vec.Y < -0.75;
 }
 
 bool UCollisionHandler::FDirection::Down() const {
-	return Vec.Y > 0.00001;
+	return Vec.Y > 0.75;
 }
 
 bool UCollisionHandler::FDirection::Left() const {
-	return Vec.X < -0.00001;
+	return Vec.X < -0.75;
 }
 
 bool UCollisionHandler::FDirection::Right() const {
-	return Vec.X > 0.00001;
+	return Vec.X > 0.75;
 }
 
 

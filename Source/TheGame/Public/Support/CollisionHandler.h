@@ -12,15 +12,14 @@ class ACharacter;
 class UPrimitiveComponent;
 
 // This Class is used for handling collisions between multple characters
-// and Static (Non-Movable) Meshes
+// and Static (Non-Movable) Meshes for SHARED SCREEN GAMES!!
 // This class requires your character have
-//      1. Trigger Capsule
+//      1. Your Camera be facing -Y direction
 //      2. four sockets to map out your characters directional state
 //         They must match the names Front, Back, Left, Right
-//      3. Your TriggerCapsule must have an OnComponentBeginOverlap & OnComponentEndOverlap
+//      3. Your Mesh must have an OnComponentBeginOverlap & OnComponentEndOverlap
 //         event to handle what goes on
-//      4. This class requires you leave the default names of Mesh and/or StaticMesh,
-//         for the component names
+//      4. This class requires you leave the default component names of Mesh and/or StaticMesh,
 UCLASS()
 class THEGAME_API UCollisionHandler : public UActorComponent
 {
