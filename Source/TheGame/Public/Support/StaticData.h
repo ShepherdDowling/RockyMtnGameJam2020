@@ -3,15 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <atomic>
+#include "GameFramework/Actor.h"
+#include "StaticData.generated.h"
 
 /**
  *  This is a pod-class that holds data specific to this game
  *  Game & player data gets stored here that the GameMode will later reference. 
+ *
+ *  TODO: Update this to using an "AGameState" class
  */
-class StaticData
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class THEGAME_API AStaticData : public AActor
 {
+    GENERATED_BODY()
 public:
-    static std::atomic<bool> GameOver; // = false
-    static std::atomic<int>  Winner;   // = 0; The user will think in terms of 1..
+    static bool GameOver; // = false
+    static int  Winner;   // = 0; The user will think in terms of 1..
+
+    UFUNCTION(BlueprintCallable, Category = "State")
+    bool GetGameOver();
+
+    UFUNCTION(BlueprintCallable, Category = "State")
+    int GetWinner();
 };

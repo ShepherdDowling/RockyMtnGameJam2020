@@ -17,6 +17,7 @@
 #include "UObject/UObjectGlobals.h" 
 #include "Engine/World.h" 
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/WidgetBlueprintLibrary.h" 
 
 
 
@@ -156,6 +157,10 @@ void ADefaultGameMode::StartPlay()
 {
     Super::StartPlay();
 
+    AStaticData::Winner = 0;
+    AStaticData::GameOver = false;
+
+    UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
     UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *GetWorld()->GetMapName());
     if (!bLevelLoaded)
         return;
@@ -167,13 +172,12 @@ void ADefaultGameMode::StartPlay()
         return;
     }
     Init();
-    StaticData::GameOver = false;
 }
 
 void ADefaultGameMode::Tick(float DeltaSeconds)
 {
     UpdateHPBars();
-    if (!StaticData::GameOver)
+    if (!AStaticData::GameOver)
     {
         int inc = 0;
         for (auto player : GodzillaArr)
@@ -181,16 +185,21 @@ void ADefaultGameMode::Tick(float DeltaSeconds)
             inc++;
             if (player->GetHP() == 0)
             {
-                StaticData::GameOver = true;
-                StaticData::Winner = inc;
-                Winner = player->GetName();
+                AStaticData::GameOver = true;
                 watch->SetTimer(4);
             }
         }
     }
-    else if (StaticData::GameOver && (!watch->TimerIsRunning()))
+    else if (AStaticData::GameOver && (!watch->TimerIsRunning()))
     {
-        StaticData::GameOver = true;
+        int inc = 0;
+        for (auto player : GodzillaArr)
+        {
+            inc++;
+            if (player->GetHP() > 0)
+                AStaticData::Winner = inc;
+        }
+        AStaticData::GameOver = true;
         UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenu"));
         RemoveFromRoot();
     }

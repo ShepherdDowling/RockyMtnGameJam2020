@@ -47,7 +47,6 @@ protected:
     TArray<AActor*>  PlayerStartArr;
     TArray<ABaseCharacter*> GodzillaArr;
 
-    FString Winner;
     bool bLevelLoaded = false;
 
     void SpawnPlayers();

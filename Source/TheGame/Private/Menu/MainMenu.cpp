@@ -34,18 +34,18 @@ AMainMenu::~AMainMenu()
 void AMainMenu::BeginPlay()
 {
     Super::BeginPlay();
+    AStaticData::GameOver = false;
 
     if (!ensure(Menu))
         return;
 
     UUserWidget* RunningMenu = nullptr;
-    if (!StaticData::Winner)
-    {
-         RunningMenu = Menu->NewGameStart();
+    auto PreviousMenu = CurrentMenu;
+    if (!AStaticData::Winner) {
+        RunningMenu = Menu->NewGameStart();
     }
-    else
-    {
-        RunningMenu = Menu->NewGameEnd();
+    else {
+        RunningMenu = Menu->NewGameOver();
     }
 
     int32 Target = 0;
@@ -56,32 +56,28 @@ void AMainMenu::BeginPlay()
         RunningMenu->GetWidgetFromName(TEXT("DefaultBtn")),
         EMouseLockMode::LockAlways
     );
-    UWidgetBlueprintLibrary::SetFocusToGameViewport();
-    UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
-    RunningMenu->RemoveFromRoot();
-    
-    StaticData::GameOver = false;
-    StaticData::Winner = 0;
 }
 
 AMainMenu::FMenus::FMenus(const ALevelScriptActor* Creator): Creator(Creator)
 {
     GameStart = new ConstructorHelpers::FClassFinder<UUserWidget>(TEXT("/Game/_Menus/GameStart"));
-    GameEnd   = new ConstructorHelpers::FClassFinder<UUserWidget>(TEXT("/Game/_Menus/GameEnd"));
+    GameOver  = new ConstructorHelpers::FClassFinder<UUserWidget>(TEXT("/Game/_Menus/GameOver"));
 }
 
 AMainMenu::FMenus::~FMenus()
 {
     if (GameStart)
         delete GameStart;
-    if (GameEnd)
-        delete GameEnd;
+    if (GameOver)
+        delete GameOver;
+
+    UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("menu destructor"));
 }
 
 UUserWidget* AMainMenu::FMenus::NewGameStart() const {
     return CreateWidget<UUserWidget>(Creator->GetWorld()->GetFirstPlayerController(), GameStart->Class);
 }
 
-UUserWidget* AMainMenu::FMenus::NewGameEnd() const {
-    return CreateWidget<UUserWidget>(Creator->GetWorld()->GetFirstPlayerController(), GameEnd->Class);
+UUserWidget* AMainMenu::FMenus::NewGameOver() const {
+    return CreateWidget<UUserWidget>(Creator->GetWorld()->GetFirstPlayerController(), GameOver->Class);
 }

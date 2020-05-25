@@ -22,12 +22,20 @@ private:
     {
         const ALevelScriptActor* Creator = nullptr;
         ConstructorHelpers::FClassFinder<UUserWidget>* GameStart = nullptr;
-        ConstructorHelpers::FClassFinder<UUserWidget>* GameEnd = nullptr;
+        ConstructorHelpers::FClassFinder<UUserWidget>* GameOver  = nullptr;
         FMenus(const ALevelScriptActor* Creator);
         ~FMenus();
         UUserWidget* NewGameStart() const;
-        UUserWidget* NewGameEnd() const;
+        UUserWidget* NewGameOver() const;
     };
+
+    enum class EMenu
+    {
+        None,
+        GameStart,
+        GameOver
+    };
+    EMenu CurrentMenu = EMenu::None;
 
     FMenus* Menu = nullptr;
 

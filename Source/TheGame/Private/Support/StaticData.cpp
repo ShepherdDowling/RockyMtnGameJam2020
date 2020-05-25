@@ -3,8 +3,15 @@
 
 #include "Support/StaticData.h"
 
-std::atomic<bool> StaticData::GameOver = false;
+bool AStaticData::GameOver = false;
+int  AStaticData::Winner = 0;
 
-std::atomic<int> StaticData::Winner = 0;
+bool AStaticData::GetGameOver()
+{
+    return AStaticData::GameOver;
+}
 
-
+int AStaticData::GetWinner()
+{
+    return AStaticData::Winner;
+}

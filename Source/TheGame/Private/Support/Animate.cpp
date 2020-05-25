@@ -5,15 +5,17 @@
 #include "Actor/BaseCharacter.h"
 
 #include "GameFramework/Actor.h" 
-#include "Animation/AnimMontage.h" 
-#include "CoreMinimal.h"
-#include "UObject/UObjectGlobals.h" 
-#include "UObject/ConstructorHelpers.h" 
 #include "GameFramework/Actor.h" 
 #include "GameFramework/Character.h"
-#include "UObject/ConstructorHelpers.h" 
+
+#include "Animation/AnimMontage.h" 
 #include "Animation/AnimSequence.h" 
 #include "Animation/AnimationAsset.h" 
+
+#include "UObject/UObjectGlobals.h" 
+#include "UObject/ConstructorHelpers.h" 
+#include "UObject/ConstructorHelpers.h" 
+
 #include "Kismet/GameplayStatics.h"
 #include "Internationalization/Regex.h"
 #include "Containers/Map.h" 
