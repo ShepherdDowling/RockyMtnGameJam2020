@@ -84,11 +84,14 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	// If you are using a controller, you will fire both with the stick (but seperatly),
 	// unless you are directly UP/Down/Left/Right
 
-	UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("============================="));
+	//UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("============================="));
+	//UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("Started ModifyDirectional()"));
 
 	if (Self.Actor == Other.Actor || (!Other.Actor) || (!Other.Mesh))
+	{
+		Self.Actor = nullptr;
 		return;
-
+	}
 
 	Collision.Front = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Front), Empty.Quat, Empty.Shape);
 	Collision.Back  = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Back),  Empty.Quat, Empty.Shape);
@@ -96,42 +99,34 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	Collision.Right = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Right), Empty.Quat, Empty.Shape);
 	Free = Collision.Reverse();
 
-
 	FMovement Move(X, Y, GetThisCharacter(), &DirectionalRef);
 
 	if (Collision.AllClear() || Collision.AllBlocked())
+	{
+		Other.Actor = nullptr;
 		return Move.Character();
+	}
 	
-
 	FDirection Facing(Self.Actor->GetTransform().GetRotation().GetAxisX());
-	UE_LOG(LogTemp, Warning, TEXT("---------- U  D  L  R"));
-	UE_LOG(LogTemp, Warning, TEXT("Collision: %d  %d  %d  %d"), Collision.Front, Collision.Back, Collision.Left, Collision.Right);
-	UE_LOG(LogTemp, Warning, TEXT("Facing:    %d  %d  %d  %d"), Facing.Up(), Facing.Down(), Facing.Left(), Facing.Right());
-	UE_LOG(LogTemp, Warning, TEXT("Moving:    %d  %d  %d  %d"), Move.Up(), Move.Down(), Move.Left(), Move.Right());
+	//UE_LOG(LogTemp, Warning, TEXT("---------- U  D  L  R"));
+	//UE_LOG(LogTemp, Warning, TEXT("Collision: %d  %d  %d  %d"), Collision.Front, Collision.Back, Collision.Left, Collision.Right);
+	//UE_LOG(LogTemp, Warning, TEXT("Facing:    %d  %d  %d  %d"), Facing.Up(), Facing.Down(), Facing.Left(), Facing.Right());
+	//UE_LOG(LogTemp, Warning, TEXT("Moving:    %d  %d  %d  %d"), Move.Up(), Move.Down(), Move.Left(), Move.Right());
+	//UE_LOG(LogTemp, Warning, TEXT("Rounded:   %d  %d  %d  %d"), FMath::RoundToInt(X), FMath::RoundToInt(Facing.Vec.X), FMath::RoundToInt(Y), FMath::RoundToInt(Facing.Vec.Y));
 
-	// Easy way to calculate.
-	// If you have a collision on the right, you are probably free on the left (because characters don't wrap-around)
-	// So if you are facing forward, you have a collision to your right, you should be able to go left
-
-	UE_LOG(LogTemp, Warning, TEXT("Rounded:   %d  %d  %d  %d"), FMath::RoundToInt(X), FMath::RoundToInt(Facing.Vec.X), FMath::RoundToInt(Y), FMath::RoundToInt(Facing.Vec.Y));
-	//if ((FMath::RoundToInt(X) == FMath::RoundToInt(Facing.Vec.X) || FMath::RoundToInt(Y) == FMath::RoundToInt(Facing.Vec.Y)))
-	//{
-	//	// If I am moving in a forward direction (direction that I am facing), the collision must be at the front if there is one
-	//	if (Free.Front)
-	//		return Move.Character();
-
-	//	UE_LOG(LogTemp, Warning, TEXT("LOG: Front Facing"));
-	//}
+	bool FacingMatched = (FMath::RoundToInt(X) == FMath::RoundToInt(Facing.Vec.X) && FMath::RoundToInt(Y) == FMath::RoundToInt(Facing.Vec.Y));
 
 	if (Facing.Up())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 0);
-		// Move where the collision is NOT
+		//UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 1);
 		if (
-			   ((!Collision.Front) && Move.Up())
-			|| ((!Collision.Back)  && Move.Down())
-			|| ((!Collision.Left)  && Move.Left())
-			|| ((!Collision.Right) && Move.Right())
+			   (Free.Front && Move.Up())
+			|| (Free.Back  && Move.Down())
+			|| (Free.Left  && Move.Left())
+			|| (Free.Right && Move.Right())
+			|| (Move.Up() && Collision.Right && Facing.RightInPart())
+			|| (Move.Up() && Collision.Left && Facing.LeftInPart())
+			|| (Move.Up() && (Collision.Left || Collision.Right) && FacingMatched)
 			)
 		{
 			return Move.Character();
@@ -139,8 +134,7 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	}
 	else if (Facing.Down())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 1);
-		// Move where the collision is (mirrored)
+		//UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 2);
 		if
 			(
 				   (Collision.Back  && Move.Down())
@@ -157,6 +151,9 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 				|| (Free.Right && Move.Left())
 				|| (Free.Back  && Move.Up())
 				|| (Free.Front && Move.Down())
+				|| (Move.Down() && Collision.Right && Facing.LeftInPart()) // Mirror
+				|| (Move.Down() && Collision.Left && Facing.RightInPart())
+				|| (Move.Down() && (Collision.Left || Collision.Right) && FacingMatched)
 				)
 		{
 			return Move.Character();
@@ -164,11 +161,13 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	}
 	else if (Facing.Left())
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 3);
 		if (
-			   (Move.Up()    && (!Collision.Right))
-			|| (Move.Down()  && (!Collision.Left))
-			|| (Move.Left()  && (!Collision.Front))
-			|| (Move.Right() && (!Collision.Back))
+			   (Move.Up()    && Free.Right)
+			|| (Move.Down()  && Free.Left)
+			|| (Move.Left()  && Free.Front)
+			|| (Move.Right() && Free.Back)
+			|| (Move.Left()  && (Collision.Right || Collision.Left))
 			)
 		{
 			return Move.Character();
@@ -176,38 +175,23 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	}
 	else if (Facing.Right())
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 4);
 		if (
-			   (Move.Up()    && (!Collision.Left))
-			|| (Move.Down()  && (!Collision.Right))
-			|| (Move.Left()  && (!Collision.Back))
-			|| (Move.Right() && (!Collision.Front))
+			   (Move.Up()    && Free.Left)
+			|| (Move.Down()  && Free.Right)
+			|| (Move.Left()  && Free.Back)
+			|| (Move.Right() && Free.Front)
+			|| (Move.Right() && (Collision.Right || Collision.Left))
 			)
 		{
 			return Move.Character();
 		}
 	}
-
-	//if (X)
+	//else
 	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 3);
-	//	if ((Free.Left && Free.Right) && (Facing.Up() || Facing.Down()))
-	//		return Move.Character();
-	//	else if ((Free.Front && Free.Back) && (Facing.Left() || Facing.Right()))
-	//		return Move.Character();
-
-	//	UE_LOG(LogTemp, Warning, TEXT("LOG: X"));
+	//	UE_LOG(LogTemp, Warning, TEXT("Not Facing Any Distinct Direction"));
+	//	UE_LOG(LogTemp, Warning, TEXT("FACING:    %f  %f"), Facing.Vec.X, Facing.Vec.Y);
 	//}
-	//else // Y
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Hit: %d"), 4);
-	//	if ((Free.Front && Free.Back) && (Facing.Up() || Facing.Down()))
-	//		return Move.Character();
-	//	else if ((Free.Left && Free.Right) && (Facing.Left() || Facing.Right()))
-	//		return Move.Character();
-
-	//	UE_LOG(LogTemp, Warning, TEXT("LOG: Y"));
-	//}
-	
 }
 // --------------------------------------------------------------------------------------------------------------------------------------------
 UCollisionHandler::FMovement::FMovement(float iX, float iY, ACharacter* iThisCharacter, const FVector* iDirectionalRefPtr)
@@ -245,19 +229,35 @@ UCollisionHandler::FDirection::FDirection(FVector&& iVector)
 }
 
 bool UCollisionHandler::FDirection::Up() const {
-	return Vec.Y < -0.75;
+	return Vec.Y <= -0.7;
 }
 
 bool UCollisionHandler::FDirection::Down() const {
-	return Vec.Y > 0.75;
+	return Vec.Y >= 0.7;
 }
 
 bool UCollisionHandler::FDirection::Left() const {
-	return Vec.X < -0.75;
+	return Vec.X <= -0.7;
 }
 
 bool UCollisionHandler::FDirection::Right() const {
-	return Vec.X > 0.75;
+	return Vec.X >= 0.7;
+}
+
+bool UCollisionHandler::FDirection::UpInPart() const {
+	return Vec.Y <= -0.0001;
+}
+
+bool UCollisionHandler::FDirection::DownInPart() const {
+	return Vec.Y >= 0.0001;
+}
+
+bool UCollisionHandler::FDirection::LeftInPart() const {
+	return Vec.X <= -0.0001;
+}
+
+bool UCollisionHandler::FDirection::RightInPart() const {
+	return Vec.X >= 0.0001;
 }
 
 

@@ -33,6 +33,10 @@ private:
         bool Down() const;
         bool Left() const;
         bool Right() const;
+        bool UpInPart() const;
+        bool DownInPart() const;
+        bool LeftInPart() const;
+        bool RightInPart() const;
     };
 
     struct FMovement

@@ -144,13 +144,13 @@ float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 
 void AGodzilla::OnCompBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
 {
-    UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompBeginOverlap"));
-    CollisionHandler->SetCollidingActor(otherActor);
+    //UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompBeginOverlap"));
+    if(this != otherActor)
+        CollisionHandler->SetCollidingActor(otherActor);
 }
 
 void AGodzilla::OnCompEndOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
-    UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompEndOverlap"));
-    if (this != otherActor) 
-        CollisionHandler->SetCollidingActor(nullptr);
+    //UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("OnCompEndOverlap"));
+    CollisionHandler->SetCollidingActor(nullptr);
 }
