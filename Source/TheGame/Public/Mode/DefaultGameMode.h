@@ -43,7 +43,6 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TSubclassOf<class UDefaultHUD> SubClassHUD;
 
-    bool GameOver = false;
     FWatch* watch;
     TArray<AActor*>  PlayerStartArr;
     TArray<ABaseCharacter*> GodzillaArr;

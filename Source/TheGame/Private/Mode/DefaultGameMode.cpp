@@ -7,6 +7,7 @@
 #include "Asset/DefaultHUD.h"
 #include "Support/Rock.h"
 #include "Support/Watch.h"
+#include "Support/StaticData.h"
 
 #include "GameFramework/Actor.h"
 #include "GameFramework/PlayerStart.h"
@@ -166,27 +167,30 @@ void ADefaultGameMode::StartPlay()
         return;
     }
     Init();
+    StaticData::GameOver = false;
 }
 
 void ADefaultGameMode::Tick(float DeltaSeconds)
 {
     UpdateHPBars();
-    if (!GameOver)
+    if (!StaticData::GameOver)
     {
+        int inc = 0;
         for (auto player : GodzillaArr)
         {
-            if (!player)
-                continue;
+            inc++;
             if (player->GetHP() == 0)
             {
-                GameOver = true;
+                StaticData::GameOver = true;
+                StaticData::Winner = inc;
                 Winner = player->GetName();
                 watch->SetTimer(4);
             }
         }
     }
-    else if (GameOver && (!watch->TimerIsRunning()))
+    else if (StaticData::GameOver && (!watch->TimerIsRunning()))
     {
+        StaticData::GameOver = true;
         UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenu"));
         RemoveFromRoot();
     }

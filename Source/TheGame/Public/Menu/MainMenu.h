@@ -18,10 +18,18 @@ class THEGAME_API AMainMenu : public ALevelScriptActor
 {
 	GENERATED_BODY()
 private:
-    ConstructorHelpers::FClassFinder<UUserWidget>* CHMainMenu = nullptr;
-    //UUserWidget* MainMenu = nullptr;
-    UPROPERTY()
-    UUserWidget* MainMenu = nullptr;
+    struct FMenus
+    {
+        const ALevelScriptActor* Creator = nullptr;
+        ConstructorHelpers::FClassFinder<UUserWidget>* GameStart = nullptr;
+        ConstructorHelpers::FClassFinder<UUserWidget>* GameEnd = nullptr;
+        FMenus(const ALevelScriptActor* Creator);
+        ~FMenus();
+        UUserWidget* NewGameStart() const;
+        UUserWidget* NewGameEnd() const;
+    };
+
+    FMenus* Menu = nullptr;
 
 protected:
     AMainMenu();

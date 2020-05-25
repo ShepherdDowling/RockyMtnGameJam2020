@@ -2,6 +2,8 @@
 
 #include "Menu/MainMenu.h"
 
+#include "Support/StaticData.h"
+
 #include "UMG/Public/Blueprint/UserWidget.h"
 #include "Asset/DefaultHUD.h"
 
@@ -19,32 +21,67 @@
 
 AMainMenu::AMainMenu()
 {
-    CHMainMenu = new ConstructorHelpers::FClassFinder<UUserWidget>(TEXT("/Game/_Menus/MainMenuUI"));
-    ensure(CHMainMenu);
+    Menu = new FMenus(this);
+    ensure(Menu);
 }
 
 AMainMenu::~AMainMenu()
 {
-    if (CHMainMenu)
-        delete CHMainMenu;
+    if (Menu)
+        delete Menu;
 }
 
 void AMainMenu::BeginPlay()
 {
     Super::BeginPlay();
-    MainMenu = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), CHMainMenu->Class);
 
-    if (!ensure(MainMenu))
+    if (!ensure(Menu))
         return;
 
+    UUserWidget* RunningMenu = nullptr;
+    if (!StaticData::Winner)
+    {
+         RunningMenu = Menu->NewGameStart();
+    }
+    else
+    {
+        RunningMenu = Menu->NewGameEnd();
+    }
+
     int32 Target = 0;
-    MainMenu->AddToViewport(Target);
+    RunningMenu->AddToViewport(Target);
     GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
     UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(
-        GetWorld()->GetFirstPlayerController(), 
-        MainMenu->GetWidgetFromName(TEXT("StartBtn")), 
+        GetWorld()->GetFirstPlayerController(),
+        RunningMenu->GetWidgetFromName(TEXT("DefaultBtn")),
         EMouseLockMode::LockAlways
     );
     UWidgetBlueprintLibrary::SetFocusToGameViewport();
     UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
+    RunningMenu->RemoveFromRoot();
+    
+    StaticData::GameOver = false;
+    StaticData::Winner = 0;
+}
+
+AMainMenu::FMenus::FMenus(const ALevelScriptActor* Creator): Creator(Creator)
+{
+    GameStart = new ConstructorHelpers::FClassFinder<UUserWidget>(TEXT("/Game/_Menus/GameStart"));
+    GameEnd   = new ConstructorHelpers::FClassFinder<UUserWidget>(TEXT("/Game/_Menus/GameEnd"));
+}
+
+AMainMenu::FMenus::~FMenus()
+{
+    if (GameStart)
+        delete GameStart;
+    if (GameEnd)
+        delete GameEnd;
+}
+
+UUserWidget* AMainMenu::FMenus::NewGameStart() const {
+    return CreateWidget<UUserWidget>(Creator->GetWorld()->GetFirstPlayerController(), GameStart->Class);
+}
+
+UUserWidget* AMainMenu::FMenus::NewGameEnd() const {
+    return CreateWidget<UUserWidget>(Creator->GetWorld()->GetFirstPlayerController(), GameEnd->Class);
 }

@@ -12,5 +12,6 @@
 class StaticData
 {
 public:
-    std::atomic<bool> PlayerDied = false;
+    static std::atomic<bool> GameOver; // = false
+    static std::atomic<int>  Winner;   // = 0; The user will think in terms of 1..
 };
