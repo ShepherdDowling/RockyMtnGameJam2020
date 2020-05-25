@@ -72,8 +72,7 @@ AActor* UCollisionHandler::GetCollidingActor() const {
 	return Other.Actor;
 }
 
-FVector UCollisionHandler::GetCollisionLocation()
-{
+FVector UCollisionHandler::GetCollisionLocation(){
 	return Other.Actor->GetTargetLocation();
 }
 
@@ -99,7 +98,7 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	Collision.Right = Other.Mesh->OverlapComponent(MeshCompass.GetLocation(ESocket::Right), Empty.Quat, Empty.Shape);
 	Free = Collision.Reverse();
 
-	FMovement Move(X, Y, GetThisCharacter(), &DirectionalRef);
+	FMovement Move(GetThisCharacter(), &DirectionalRef, X, Y);
 
 	if (Collision.AllClear() || Collision.AllBlocked())
 	{
@@ -194,8 +193,8 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 	//}
 }
 // --------------------------------------------------------------------------------------------------------------------------------------------
-UCollisionHandler::FMovement::FMovement(float iX, float iY, ACharacter* iThisCharacter, const FVector* iDirectionalRefPtr)
-	: X(iX), Y(iY), ThisCharacter(iThisCharacter), DirectionalRefPtr(iDirectionalRefPtr)
+UCollisionHandler::FMovement::FMovement(ACharacter* iThisCharacter, const FVector* iDirectionalRefPtr, float iX, float iY)
+	: ThisCharacter(iThisCharacter), DirectionalRefPtr(iDirectionalRefPtr), X(iX), Y(iY)
 {
 }
 

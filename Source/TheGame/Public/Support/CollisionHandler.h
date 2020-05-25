@@ -46,7 +46,7 @@ private:
         const float X = 0;
         const float Y = 0;
 
-        FMovement(float iX, float iY, ACharacter* iThisCharacter, const FVector* iDirectionalRefPtr);
+        FMovement(ACharacter* iThisCharacter, const FVector* iDirectionalRefPtr, float iX, float iY);
         bool Up() const;
         bool Down() const;
         bool Left() const;

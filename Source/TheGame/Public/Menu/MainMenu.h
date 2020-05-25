@@ -6,6 +6,9 @@
 #include "Engine/LevelScriptActor.h"
 #include "MainMenu.generated.h"
 
+class UUserWidget;
+class UWidgetBlueprintLibrary;
+
 /**
  *   Level MainMenu inherits from this class
  *   This class is responsible for displaying the Menu UI Widgets
@@ -15,9 +18,13 @@ class THEGAME_API AMainMenu : public ALevelScriptActor
 {
 	GENERATED_BODY()
 private:
-    ConstructorHelpers::FClassFinder<UUserWidget>* MainMenu = nullptr;
-protected:
+    ConstructorHelpers::FClassFinder<UUserWidget>* CHMainMenu = nullptr;
+    //UUserWidget* MainMenu = nullptr;
+    UPROPERTY()
+    UUserWidget* MainMenu = nullptr;
 
+protected:
+    AMainMenu();
     virtual ~AMainMenu();
     virtual void BeginPlay() override;
 };
