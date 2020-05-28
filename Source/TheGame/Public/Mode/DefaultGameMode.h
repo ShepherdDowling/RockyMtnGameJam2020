@@ -31,6 +31,7 @@ private:
 
     TArray<FName> HPText;
 
+    void SetSimulateGame();
     void UpdateHPBars();
 
 protected:
@@ -45,11 +46,12 @@ protected:
 
     FWatch* watch;
     TArray<AActor*>  PlayerStartArr;
-    TArray<ABaseCharacter*> GodzillaArr;
+    TArray<ABaseCharacter*> PlayerPawnArr;
 
     bool bLevelLoaded = false;
+    bool bSimulatingGame = false;
 
-    void SpawnPlayers();
+    bool SpawnPlayers();
     void LockSharedCamera();
     void AddHpBars();
 
@@ -63,4 +65,5 @@ public:
     int GetMaxPlayerCount() const;
     bool GetLevelLoaded() const;
     void SetLevelLoaded(bool truth); 
+    TArray<ABaseCharacter*> GetPlayerPawnArray() const;
 };

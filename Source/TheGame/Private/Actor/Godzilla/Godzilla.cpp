@@ -3,6 +3,7 @@
 
 #include "Actor/Godzilla/Godzilla.h"
 #include "Asset/DefaultHUD.h"
+#include "Mode/DefaultGameMode.h"
 #include "Support/Rock.h"
 #include "Support/Animate.h"
 #include "Support/CollisionHandler.h"
@@ -24,15 +25,16 @@
 #include "GameFramework/SpringArmComponent.h"
 
 #include "Animation/AnimSequence.h" 
-#include "Animation/AnimationAsset.h" 
+#include "Animation/AnimationAsset.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "Engine/World.h" 
 #include "Math/UnrealMathUtility.h" 
-#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Delegates/DelegateSignatureImpl.inl" 
-
 
 
 
@@ -40,14 +42,41 @@
 void AGodzilla::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
-    PlayerInputComponent->BindAction(TEXT("TailWhip"), IE_Pressed, this, &AGodzilla::TailWhip);
+
+    PlayerInputComponent->BindAction(TEXT("RightTailWhip"), IE_Pressed, this, &AGodzilla::RightTailWhip);
     PlayerInputComponent->BindAction(TEXT("Bite"), IE_Pressed, this, &AGodzilla::Bite);
+
+    PlayerInputComponent->BindAction(TEXT("FaceLock"), IE_Pressed, this, &AGodzilla::FaceLock);
 }
 
 
-void AGodzilla::TailWhip()
+void AGodzilla::FaceLock()
 {
-    Animate->Animate(TEXT("Attack/TailWhip/TailWhipMT"), true);
+    UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("face lock"));
+
+    auto GameMode = Cast<ADefaultGameMode>(GetWorld()->GetAuthGameMode());
+    if (!ensure(GameMode))
+        return;
+
+    ABaseCharacter* Target = nullptr;
+    for (auto Pawn : GameMode->GetPlayerPawnArray())
+    {
+        if (Pawn != this)
+        {
+            Target = Pawn;
+            break;
+        }
+    }
+    if (!Target)
+        return;
+
+    auto Rotation = UKismetMathLibrary::FindLookAtRotation(this->GetTargetLocation(), Target->GetTargetLocation());
+    GetMovementComponent()->UpdatedComponent->SetWorldRotation(Rotation);
+}
+
+void AGodzilla::RightTailWhip()
+{
+    Animate->Animate(TEXT("Attack/RightTailWhip/RightTailWhipMT"), true);
 }
 
 void AGodzilla::Bite()
@@ -66,7 +95,7 @@ AGodzilla::AGodzilla()
     UAnimate::SetHome(TEXT("/Game/_Actors/Godzilla/Animations"));
     Animate->SetActor(Cast<ABaseCharacter>(this));
 
-    Animate->Add(UAnimate::NewAnimation(TEXT("Attack/TailWhip/TailWhipMT")));
+    Animate->Add(UAnimate::NewAnimation(TEXT("Attack/RightTailWhip/RightTailWhipMT")));
     Animate->Add(UAnimate::NewAnimation(TEXT("Attack/Bite/BiteMT")));
     Animate->Add(UAnimate::NewAnimation(TEXT("Movement/Die")));
 

@@ -21,11 +21,11 @@
 
 
 
-void ADefaultGameMode::SpawnPlayers()
+bool ADefaultGameMode::SpawnPlayers()
 {
-    for (auto player : GodzillaArr)
+    for (auto player : PlayerPawnArr)
         player->Destroy();
-    GodzillaArr.Empty();
+    PlayerPawnArr.Empty();
     
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArr);
 
@@ -53,8 +53,15 @@ void ADefaultGameMode::SpawnPlayers()
 
             vController->Possess(vGodzilla);
         }
-        GodzillaArr.Add(Cast<AGodzilla>(vController->GetCharacter()));
+        PlayerPawnArr.Add(Cast<AGodzilla>(vController->GetCharacter()));
     }
+
+    if (!GetWorld()->GetFirstPlayerController())
+        return true;
+    if (!GetWorld()->GetFirstPlayerController()->GetPawn())
+        return true;
+
+    return false;
 }
 
 void ADefaultGameMode::LockSharedCamera()
@@ -75,7 +82,7 @@ void ADefaultGameMode::LockSharedCamera()
 
         if (ensure(MobileCamera))
         {
-            MobileCamera->AddReferences(this, &PlayerStartArr, &GodzillaArr);
+            MobileCamera->AddReferences(this, &PlayerStartArr, &PlayerPawnArr);
             MobileCamera->LinkCameraAndActors();
         }
     }
@@ -93,21 +100,32 @@ void ADefaultGameMode::AddHpBars()
 
 void ADefaultGameMode::Init()
 {
-    SpawnPlayers();
+    bSimulatingGame = SpawnPlayers();
+
+    if (bSimulatingGame)
+        return SetSimulateGame();
+
     LockSharedCamera();
     AddHpBars();
 }
 
+void ADefaultGameMode::SetSimulateGame()
+{
+    bSimulatingGame = true;
+    SetActorTickEnabled(false);
+    PrimaryActorTick.bCanEverTick = false;
+}
+
 void ADefaultGameMode::UpdateHPBars()
 {
-    if (GodzillaArr.Num() < 2)
+    if (PlayerPawnArr.Num() < 2)
         return;
 
     for (int32 i = 0; i < MaxPlayerCount; i++)
     {
-        UProgressBar* LifeBar = Cast<UProgressBar>(GodzillaArr[0]->GetHUD()->WidgetTree->FindWidget(HPText[i]));
-        if (LifeBar && GodzillaArr[i])
-            LifeBar->SetPercent(GodzillaArr[i]->GetHP());
+        UProgressBar* LifeBar = Cast<UProgressBar>(PlayerPawnArr[0]->GetHUD()->WidgetTree->FindWidget(HPText[i]));
+        if (LifeBar && PlayerPawnArr[i])
+            LifeBar->SetPercent(PlayerPawnArr[i]->GetHP());
     }
 }
 
@@ -160,6 +178,7 @@ void ADefaultGameMode::StartPlay()
     AStaticData::Winner = 0;
     AStaticData::GameOver = false;
 
+
     UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
     UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *GetWorld()->GetMapName());
     if (!bLevelLoaded)
@@ -180,7 +199,7 @@ void ADefaultGameMode::Tick(float DeltaSeconds)
     if (!AStaticData::GameOver)
     {
         int inc = 0;
-        for (auto player : GodzillaArr)
+        for (auto player : PlayerPawnArr)
         {
             inc++;
             if (player->GetHP() == 0)
@@ -193,7 +212,7 @@ void ADefaultGameMode::Tick(float DeltaSeconds)
     else if (AStaticData::GameOver && (!watch->TimerIsRunning()))
     {
         int inc = 0;
-        for (auto player : GodzillaArr)
+        for (auto player : PlayerPawnArr)
         {
             inc++;
             if (player->GetHP() > 0)
@@ -218,4 +237,9 @@ bool ADefaultGameMode::GetLevelLoaded() const
 void ADefaultGameMode::SetLevelLoaded(bool truth)
 {
     bLevelLoaded = truth;
+}
+
+TArray<ABaseCharacter*> ADefaultGameMode::GetPlayerPawnArray() const
+{
+    return PlayerPawnArr;
 }
