@@ -37,9 +37,9 @@
 // TODO: REMOVE UN-NEEDED HEADERS ABOVE
 // ---------------------------------------------------
 
-void UNotifyDamageTaken::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
+void UNotifyDamageTaken::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
-    UE_LOG(LogTemp, Warning, TEXT("LOG: %s"), *FString("Hit from C++"));
+    Super::NotifyTick(MeshComp, Animation, TotalDuration);
 
     auto Character = Cast<ABaseCharacter>(MeshComp->GetOwner());
     if (!Character)
@@ -51,13 +51,13 @@ void UNotifyDamageTaken::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
     // Blueprint known as SphereTraceByChannel
     UKismetSystemLibrary::SphereTraceSingle(
         MeshComp,
-        MeshComp->GetBoneLocation(Tail.Start),
-        MeshComp->GetBoneLocation(Tail.End),
+        MeshComp->GetBoneLocation(Tail.End), // This is important (End of the spear goes first)!! 
+        MeshComp->GetBoneLocation(Tail.Start), // (otherwise you may not get the bone name)
         Radius.LineTrace,
         ETraceTypeQuery::TraceTypeQuery1,
         false,          // Trace Complex
-        TArray<AActor*>(), // Characters to ignore (bool for us later)
-        EDrawDebugTrace::Type::ForDuration,
+        TArray<AActor*>{ Character }, // Characters to ignore (bool for us later)
+        EDrawDebugTrace::Type::None,
         HitData,        // Out param for hit data
         true,           // Dont' hit yourself
         ARock::Red,     // Trace Color
@@ -65,10 +65,17 @@ void UNotifyDamageTaken::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
         5.0f            // Draw Time        
     );
 
-    if (!HitData.Actor.Get())
+    if (HitData.Actor.Get()) {
+       // UE_LOG(LogTemp, Warning, TEXT(">>> Actor >>>: %s"), *HitData.Actor->GetName()); 
+    }
+    if (HitData.BoneName != ARock::NameNone) {
+        UE_LOG(LogTemp, Warning, TEXT(">>> Limb  >>>: %s"), *HitData.BoneName.ToString());
+    }
+
+    if (!HitData.Actor.Get() || HitData.BoneName == ARock::NameNone)
         return;
 
-    if (HitData.BoneName == WeakDamageLimb)
+    if (HitData.BoneName.ToString().Mid(0, 4) == WeakDamageLimb) // Mid is Non-Inclusive
         BaseDamage = DamageStrength.Weak;
     else
         BaseDamage = DamageStrength.Heavy;
@@ -85,11 +92,13 @@ void UNotifyDamageTaken::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
         true, // Do Full Damage,
         ECollisionChannel::ECC_Visibility
     );
+
+
 }
 
 UNotifyDamageTaken::UNotifyDamageTaken()
 {
     Tail.Start = TEXT("Tail1_M");
     Tail.End = TEXT("Tail6_M");
-    WeakDamageLimb = TEXT("Tail0_M");
+    WeakDamageLimb = TEXT("Tail");
 }

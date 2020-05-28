@@ -32,6 +32,8 @@ public:
 	static const FLinearColor Green;
 	static const FLinearColor Blue;
 
+	static const FName NameNone;
+
 	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, const FString& Name);
 	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, FString&& Name);
 

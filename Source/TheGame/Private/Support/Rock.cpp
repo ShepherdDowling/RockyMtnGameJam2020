@@ -11,6 +11,8 @@ const FLinearColor ARock::Red(1.f, 0, 0);
 const FLinearColor ARock::Green(0, 1.f, 0);
 const FLinearColor ARock::Blue(0, 0, 1.f);
 
+const FName ARock::NameNone(TEXT("None"));
+
 UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, const FString& Name)
 {
     if (!Actor)
