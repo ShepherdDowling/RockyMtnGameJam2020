@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright by Shepherd Dowling under the Apache v2 licence
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "NotifyDamageTaken.generated.h"
-
 
 
 /**

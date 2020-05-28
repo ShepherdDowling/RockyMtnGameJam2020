@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright by Shepherd Dowling under the Apache v2 licence
 
 
 #include "Actor/Godzilla/NotifyDamageTaken.h"
@@ -6,33 +6,10 @@
 #include "Actor/BaseCharacter.h"
 #include "Support/Rock.h"
 
-
-#include "UObject/UObjectGlobals.h" 
-#include "UObject/ConstructorHelpers.h" 
-#include "UObject/SparseDelegate.h" 
-
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/InputComponent.h"
-#include "Components/ArrowComponent.h"
 #include "Components/StaticMeshComponent.h" 
-#include "PhysicsEngine/PhysicsHandleComponent.h"
-
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
-#include "GameFramework/SpringArmComponent.h"
-
-#include "Animation/AnimSequence.h" 
-#include "Animation/AnimationAsset.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-
-#include "Engine/World.h" 
-#include "Math/UnrealMathUtility.h" 
-#include "TimerManager.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
-#include "Delegates/DelegateSignatureImpl.inl" 
 
 // TODO: REMOVE UN-NEEDED HEADERS ABOVE
 // ---------------------------------------------------
