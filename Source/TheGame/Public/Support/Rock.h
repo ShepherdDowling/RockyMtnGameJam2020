@@ -27,6 +27,11 @@ class ARock : public AActor
 {
 	GENERATED_BODY()
 public:
+
+	static const FLinearColor Red;
+	static const FLinearColor Green;
+	static const FLinearColor Blue;
+
 	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, const FString& Name);
 	static UPrimitiveComponent* GetActorComponent(const AActor* Actor, FString&& Name);
 

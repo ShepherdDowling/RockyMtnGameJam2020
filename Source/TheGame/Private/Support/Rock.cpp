@@ -7,6 +7,9 @@
 #include "Engine/World.h" 
 
 
+const FLinearColor ARock::Red(1.f, 0, 0);
+const FLinearColor ARock::Green(0, 1.f, 0);
+const FLinearColor ARock::Blue(0, 0, 1.f);
 
 UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, const FString& Name)
 {

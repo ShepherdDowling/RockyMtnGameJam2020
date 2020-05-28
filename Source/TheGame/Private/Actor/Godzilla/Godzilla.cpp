@@ -133,7 +133,7 @@ float AGodzilla::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
     if (!ensure(EventInstigator)) return 0;
 
     ABaseCharacter* GP = Cast<ABaseCharacter>(EventInstigator->GetPawn());
-
+    
     if (!GP)
         bDoDamage = true;
     else if (GP->GetFName() != GetFName())  // we don't apply damage to ourself if radial damage is used
