@@ -53,7 +53,7 @@ void UNotifyDamageTaken::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
         MeshComp,
         MeshComp->GetBoneLocation(Tail.Start),
         MeshComp->GetBoneLocation(Tail.End),
-        Radius,
+        Radius.LineTrace,
         ETraceTypeQuery::TraceTypeQuery1,
         false,          // Trace Complex
         TArray<AActor*>(), // Characters to ignore (bool for us later)
@@ -68,18 +68,22 @@ void UNotifyDamageTaken::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequ
     if (!HitData.Actor.Get())
         return;
 
-    float Damage = 0;
     if (HitData.BoneName == WeakDamageLimb)
-        Damage = DamageStrength.Weak;
+        BaseDamage = DamageStrength.Weak;
     else
-        Damage = DamageStrength.Heavy;
+        BaseDamage = DamageStrength.Heavy;
 
     UGameplayStatics::ApplyRadialDamage(
         HitData.Actor.Get(),
-        Damage,
+        BaseDamage,
         HitData.ImpactPoint,
-        Radius,
-
+        Radius.Damage,
+        TSubclassOf<UDamageType>(),
+        TArray<AActor*>{Character},
+        Character,
+        Character->GetController(),
+        true, // Do Full Damage,
+        ECollisionChannel::ECC_Visibility
     );
 }
 

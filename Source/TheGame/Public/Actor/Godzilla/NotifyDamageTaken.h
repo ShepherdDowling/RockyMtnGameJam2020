@@ -33,13 +33,12 @@ private:
     struct FRadius
     {
 
-        float Damage;
-        float LineTrace;
-    }
+        float LineTrace = 50;
+        float Damage = 20;
+    };
     FRadius Radius;
-
+    float BaseDamage = 0;
     FName WeakDamageLimb;
-    float Radius = 50;
 
     virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
 public:
