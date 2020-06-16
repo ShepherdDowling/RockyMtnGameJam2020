@@ -25,4 +25,3 @@ The purpose of this repo is to demonstrate easy-to-use widley usable UE4 librari
        it will close the distance!
     6. DualHandle.h - (simple) This is used to hold an object with physics enabled and with locked
        location & rotation.
-

@@ -6,9 +6,6 @@
 #include "Animation/AnimInstance.h"
 #include "GodzillaAMI.generated.h"
 
-/**
- *
- */
 UCLASS(Transient, Blueprintable, BlueprintType)
 class THEGAME_API UGodzillaAMI : public UAnimInstance
 {

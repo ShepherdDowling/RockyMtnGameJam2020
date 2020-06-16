@@ -121,7 +121,6 @@ void ABaseCharacter::OnResetVR()
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-
 void ABaseCharacter::MoveForward(float Value)
 {
 	if (!Animate) return;
@@ -146,7 +145,6 @@ void ABaseCharacter::MoveForward(float Value)
 		}
 	}
 }
-
 
 void ABaseCharacter::MoveRight(float Value)
 {
@@ -196,5 +194,4 @@ int32 ABaseCharacter::GetTotalAnimationsPlayed() const
 {
 	return Animate->GetTotalAnimationsPlayed();
 }
-
 

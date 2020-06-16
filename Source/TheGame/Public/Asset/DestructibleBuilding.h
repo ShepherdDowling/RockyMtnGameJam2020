@@ -9,9 +9,7 @@
 class FWatch;
 class UDestructibleComponent;
 
-/**
- *
- */
+
 UCLASS()
 class THEGAME_API ADestructibleBuilding : public AActor
 {

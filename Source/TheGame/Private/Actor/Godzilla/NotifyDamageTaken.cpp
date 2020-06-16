@@ -67,3 +67,4 @@ UNotifyDamageTaken::UNotifyDamageTaken()
     Tail.End        = TEXT("Tail6_M");
     WeakDamageLimb  = TEXT("Tail");
 }
+

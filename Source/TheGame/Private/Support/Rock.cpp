@@ -29,11 +29,11 @@ UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, const FString
 }
 
 
-
 UPrimitiveComponent* ARock::GetActorComponent(const AActor* Actor, FString&& Name)
 {
     return ARock::GetActorComponent(Actor, Name);
 }
+
 
 UPrimitiveComponent* ARock::GetActorComponentByRegex(const AActor* Actor, const FRegexPattern& Regex)
 {
@@ -51,6 +51,7 @@ UPrimitiveComponent* ARock::GetActorComponentByRegex(const AActor* Actor, const 
     }
     return nullptr;
 }
+
 
 UPrimitiveComponent* ARock::GetActorComponentByRegex(const AActor* Actor, FRegexPattern&& Regex)
 {

@@ -91,7 +91,6 @@ void UAnimate::AddFileKey(const FName& AnimationPath)
     }
 }
 
-
 void UAnimate::Animate(const FName& str, bool bResetToBlueprint, bool bOverride)
 {
     if (!ensure(Map.Contains(str)))

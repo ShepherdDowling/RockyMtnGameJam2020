@@ -26,3 +26,4 @@ void ABattleGrounds::BeginPlay()
     GetWorld()->GetAuthGameMode<ADefaultGameMode>()->Init();
     GetWorld()->GetAuthGameMode<ADefaultGameMode>()->SetLevelLoaded(false);
 }
+

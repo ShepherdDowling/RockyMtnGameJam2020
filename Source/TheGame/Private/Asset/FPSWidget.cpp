@@ -29,3 +29,4 @@ void UFPSWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
     FPS = GAverageFPS;
 }
+

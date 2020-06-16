@@ -105,4 +105,3 @@ void ADestructibleBuilding::OnCompHit(UPrimitiveComponent* HitComp, AActor* Othe
 
     TimerBuildingCollapseStarted = true;
 }
-

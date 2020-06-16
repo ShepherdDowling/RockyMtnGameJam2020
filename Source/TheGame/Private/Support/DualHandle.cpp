@@ -43,7 +43,7 @@ void UDualHandle::Init(ACharacter* iThisCharacter, UPrimitiveComponent* iTargetC
 	GrabTarget(Two, -GrabOffset);
 }
 
-// Called every frame
+
 void UDualHandle::UpdateGrip()
 {
 	One->SetTargetLocation(ThisCharacter->GetMesh()->GetBoneLocation(BoneName) + FVector( GrabOffset,  GrabOffset,  GrabOffset));
