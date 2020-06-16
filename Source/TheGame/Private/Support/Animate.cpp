@@ -4,21 +4,12 @@
 #include "Support/Watch.h"
 #include "Actor/BaseCharacter.h"
 
-#include "GameFramework/Actor.h" 
-#include "GameFramework/Actor.h" 
 #include "GameFramework/Character.h"
-
-#include "Animation/AnimMontage.h" 
-#include "Animation/AnimSequence.h" 
-#include "Animation/AnimationAsset.h" 
-
-#include "UObject/UObjectGlobals.h" 
-#include "UObject/ConstructorHelpers.h" 
-#include "UObject/ConstructorHelpers.h" 
+#include "UObject/UObjectGlobals.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Internationalization/Regex.h"
-#include "Containers/Map.h" 
+#include "Containers/Map.h"
 #include "TimerManager.h"
 
 
@@ -27,7 +18,7 @@ FString UAnimate::Home;
 void UAnimate::SetBlueprintHandleInvalid()
 {
 
-    if (ReturnToBlueprintHandle.IsValid()) 
+    if (ReturnToBlueprintHandle.IsValid())
     {
         GetWorld()->GetTimerManager().ClearTimer(ReturnToBlueprintHandle);
         ReturnToBlueprintHandle.Invalidate();
@@ -35,7 +26,7 @@ void UAnimate::SetBlueprintHandleInvalid()
     }
 }
 
-UAnimate::UAnimate()  
+UAnimate::UAnimate()
 {
     AnimationInPlay = new FWatch;
 }

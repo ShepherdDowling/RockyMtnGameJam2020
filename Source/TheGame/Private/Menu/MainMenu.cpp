@@ -5,18 +5,9 @@
 #include "Support/StaticData.h"
 
 #include "UMG/Public/Blueprint/UserWidget.h"
-#include "Asset/DefaultHUD.h"
-
-#include "UObject/UObjectGlobals.h" 
 #include "UObject/ConstructorHelpers.h" 
-
-#include "GameFramework/Controller.h"
-#include "GameFramework/PlayerStart.h"
-#include "GameFramework/Controller.h"
-
-#include "Engine/World.h" 
-#include "Kismet/GameplayStatics.h"
-#include "Blueprint/WidgetBlueprintLibrary.h" 
+#include "Engine/World.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 
 AMainMenu::AMainMenu()

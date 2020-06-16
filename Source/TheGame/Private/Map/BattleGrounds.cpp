@@ -4,17 +4,8 @@
 #include "Map/BattleGrounds.h"
 #include "Mode/DefaultGameMode.h"
 
-#include "UObject/UObjectGlobals.h" 
-#include "UObject/ConstructorHelpers.h" 
-#include "Engine/World.h" 
-
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
+#include "Engine/World.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/SpringArmComponent.h"
-
-#include "Engine/EngineBaseTypes.h" 
-#include "Math/UnrealMathUtility.h" 
 
 ABattleGrounds::ABattleGrounds()
 {

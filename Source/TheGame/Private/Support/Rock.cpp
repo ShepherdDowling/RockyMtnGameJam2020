@@ -4,7 +4,6 @@
 #include "Support/Rock.h"
 
 #include "GameFramework/Actor.h"
-#include "Engine/World.h" 
 
 
 const FLinearColor ARock::Red(1.f, 0, 0);

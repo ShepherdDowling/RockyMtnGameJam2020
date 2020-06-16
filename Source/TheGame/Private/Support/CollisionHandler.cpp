@@ -6,18 +6,9 @@
 
 #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/Controller.h"
-#include "GameFramework/CharacterMovementComponent.h"
-
-#include "UObject/UObjectGlobals.h" 
-#include "Engine/World.h" 
-
-#include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
-#include "Components/InputComponent.h"
 #include "Components/ArrowComponent.h"
 
-#include "Engine/World.h" 
 
 // Sets default values
 UCollisionHandler::UCollisionHandler()
@@ -52,7 +43,7 @@ ACharacter* UCollisionHandler::GetThisCharacter() const {
 	return Cast<ACharacter>(Self.Actor);
 }
 
-void UCollisionHandler::SetCollidingActor(AActor* actor) 
+void UCollisionHandler::SetCollidingActor(AActor* actor)
 {
 	if (Other.Actor == actor)
 		return;
@@ -105,7 +96,7 @@ void UCollisionHandler::ModifyDirectional(const FVector& DirectionalRef, float X
 		Other.Actor = nullptr;
 		return Move.Character();
 	}
-	
+
 	FDirection Facing(Self.Actor->GetTransform().GetRotation().GetAxisX());
 	//UE_LOG(LogTemp, Warning, TEXT("---------- U  D  L  R"));
 	//UE_LOG(LogTemp, Warning, TEXT("Collision: %d  %d  %d  %d"), Collision.Front, Collision.Back, Collision.Left, Collision.Right);
@@ -289,7 +280,7 @@ UCollisionHandler::FCollision UCollisionHandler::FCollision::Reverse() const
 }
 // --------------------------------------------------------------------------------------------------------------------------------------------
 UCollisionHandler::FMeshCompass::FMeshCompass()
-	: Front(FName("Front")), Back(FName("Back")), Left(FName("Left")), Right(FName("Right")) 
+	: Front(FName("Front")), Back(FName("Back")), Left(FName("Left")), Right(FName("Right"))
 {}
 
 FVector UCollisionHandler::FMeshCompass::GetLocation(ESocket SocketName)

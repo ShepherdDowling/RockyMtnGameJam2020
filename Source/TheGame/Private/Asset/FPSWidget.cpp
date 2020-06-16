@@ -4,8 +4,7 @@
 #include "Asset/FPSWidget.h"
 
 #include "Slate/SObjectWidget.h"
-#include "EngineGlobals.h"
-#include "Templates/SharedPointer.h" 
+#include "Templates/SharedPointer.h"
 
 // Build.cs add  "Slate", "SlateCore"
 

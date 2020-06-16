@@ -15,10 +15,10 @@ class THEGAME_API UGodzillaAMI : public UAnimInstance
     GENERATED_BODY()
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-        float Speed = 0;
+    float Speed = 0;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-        bool bIsInAir = false;
+    bool bIsInAir = false;
 
     UGodzillaAMI();
     virtual ~UGodzillaAMI();

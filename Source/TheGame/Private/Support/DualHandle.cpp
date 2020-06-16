@@ -5,7 +5,6 @@
 
 #include "GameFramework/Character.h"
 #include "Components/PrimitiveComponent.h" 
-#include "Components/StaticMeshComponent.h" 
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
 

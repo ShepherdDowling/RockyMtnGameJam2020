@@ -5,7 +5,6 @@
 #include "Actor/Godzilla/Godzilla.h"
 #include "Asset/MobileCamera.h"
 #include "Asset/DefaultHUD.h"
-#include "Support/Rock.h"
 #include "Support/Watch.h"
 #include "Support/StaticData.h"
 
@@ -14,10 +13,9 @@
 #include "GameFramework/Controller.h"
 
 #include "UMG/Public/Blueprint/UserWidget.h"
-#include "UObject/UObjectGlobals.h" 
-#include "Engine/World.h" 
+#include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
-#include "Blueprint/WidgetBlueprintLibrary.h" 
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 
 
@@ -26,13 +24,13 @@ bool ADefaultGameMode::SpawnPlayers()
     for (auto player : PlayerPawnArr)
         player->Destroy();
     PlayerPawnArr.Empty();
-    
+
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArr);
 
     for (int32 vPlayerIdx = 0; vPlayerIdx < PlayerStartArr.Num() && vPlayerIdx < MaxPlayerCount; vPlayerIdx++)
     {
         APlayerController* vController = UGameplayStatics::GetPlayerControllerFromID(GetWorld(), vPlayerIdx);
-        
+
         if (!vController)
             vController = UGameplayStatics::CreatePlayer(GetWorld(), vPlayerIdx, true); // true create controller
 
@@ -148,7 +146,7 @@ ADefaultGameMode::ADefaultGameMode()
 
     DefaultPawnClass = nullptr;
     //PlayerControllerClass = BpGodzillaPLC->Class;
-    
+
     SubClassHUD = HPWidgetFinder.Class;
 
     HPText.Add(TEXT("Player1HP"));

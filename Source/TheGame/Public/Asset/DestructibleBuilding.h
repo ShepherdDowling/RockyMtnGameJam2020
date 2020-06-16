@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DestructibleActor.h"
 #include "DestructibleBuilding.generated.h"
@@ -11,7 +10,7 @@ class FWatch;
 class UDestructibleComponent;
 
 /**
- * 
+ *
  */
 UCLASS()
 class THEGAME_API ADestructibleBuilding : public AActor
@@ -23,11 +22,11 @@ private:
 
 	// Used for DamageRadius
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	float WallStrength = 5; // Used for 
+	float WallStrength = 5; // Used for
 
 		// Used for DamageRadius
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	float DebrisTimeout = 50; // Used for 
+	float DebrisTimeout = 50; // Used for
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UDestructibleComponent* DestructableComponent = nullptr;

@@ -6,13 +6,9 @@
 #include "Actor/BaseCharacter.h"
 #include "Support/Rock.h"
 
-#include "Components/StaticMeshComponent.h" 
-
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
-// TODO: REMOVE UN-NEEDED HEADERS ABOVE
-// ---------------------------------------------------
 
 void UNotifyDamageTaken::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
@@ -22,13 +18,12 @@ void UNotifyDamageTaken::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
     if (!Character)
         return;
 
-    
     FHitResult HitData;
 
     // Blueprint known as SphereTraceByChannel
     UKismetSystemLibrary::SphereTraceSingle(
         MeshComp,
-        MeshComp->GetBoneLocation(Tail.End), // This is important (End of the spear goes first)!! 
+        MeshComp->GetBoneLocation(Tail.End), // This is important (End of the spear goes first)!!
         MeshComp->GetBoneLocation(Tail.Start), // (otherwise you may not get the bone name)
         Radius.LineTrace,
         ETraceTypeQuery::TraceTypeQuery1,
@@ -39,15 +34,8 @@ void UNotifyDamageTaken::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
         true,           // Dont' hit yourself
         ARock::Red,     // Trace Color
         ARock::Green,   // Hit Color
-        5.0f            // Draw Time        
+        5.0f            // Draw Time
     );
-
-    if (HitData.Actor.Get()) {
-       // UE_LOG(LogTemp, Warning, TEXT(">>> Actor >>>: %s"), *HitData.Actor->GetName()); 
-    }
-    if (HitData.BoneName != ARock::NameNone) {
-        UE_LOG(LogTemp, Warning, TEXT(">>> Limb  >>>: %s"), *HitData.BoneName.ToString());
-    }
 
     if (!HitData.Actor.Get() || HitData.BoneName == ARock::NameNone)
         return;
@@ -75,7 +63,7 @@ void UNotifyDamageTaken::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSeque
 
 UNotifyDamageTaken::UNotifyDamageTaken()
 {
-    Tail.Start = TEXT("Tail1_M");
-    Tail.End = TEXT("Tail6_M");
-    WeakDamageLimb = TEXT("Tail");
+    Tail.Start      = TEXT("Tail1_M");
+    Tail.End        = TEXT("Tail6_M");
+    WeakDamageLimb  = TEXT("Tail");
 }

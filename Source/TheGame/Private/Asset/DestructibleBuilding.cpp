@@ -2,26 +2,15 @@
 
 
 #include "Asset/DestructibleBuilding.h"
-#include "DestructibleMesh.h"
-#include "GameFramework/Actor.h"
-#include "Engine/World.h"
-#include "GenericPlatform/GenericPlatformProcess.h" 
-#include "engine/EngineTypes.h"
-#include "CoreMinimal.h"
-#include "Engine/SkeletalMesh.h" 
-
 #include "Support/Watch.h"
 
-#include "Components/PrimitiveComponent.h" 
-#include "Components/StaticMeshComponent.h" 
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "Engine/EngineTypes.h"
+#include "Engine/SkeletalMesh.h"
+#include "Components/PrimitiveComponent.h"
+#include "DestructibleMesh.h" // Required
 #include "DestructibleComponent.h"
-
-#include "Components/SphereComponent.h" 
-#include "Components/SceneComponent.h" 
-
-#include "PhysicsEngine/PhysicsConstraintComponent.h" 
-#include "PhysicsEngine/ConstraintInstance.h" 
-
 #include "Kismet/GameplayStatics.h"
 
 ADestructibleBuilding::ADestructibleBuilding()
@@ -34,7 +23,7 @@ ADestructibleBuilding::ADestructibleBuilding()
     DestructableComponent->SetNotifyRigidBodyCollision(true);
     DestructableComponent->SetCollisionProfileName("Destructible"); // view editor for specifics
     DestructableComponent->OnComponentHit.AddDynamic(this, &ADestructibleBuilding::OnCompHit);
-    
+
     SetRootComponent(DestructableComponent);
     Watch = new FWatch;
 }
@@ -72,12 +61,12 @@ void ADestructibleBuilding::Tick(float DeltaTime)
 
     GetTransform().GetLocation() += FVector(0, 0, -0.2);
 
-    float WorldScaling = 0.2; 
+    float WorldScaling = 0.2;
     float BufferDistance = 50000;
 
     if(BuidlingStartZ > GetTransform().GetLocation().Z + (BuildingHeight * WorldScaling + BufferDistance))
         Destroy();
-    
+
 
     if (PhysicsEnabled)
     {
@@ -103,7 +92,7 @@ void ADestructibleBuilding::OnCompHit(UPrimitiveComponent* HitComp, AActor* Othe
     auto IgnoredActors = TArray<AActor*>{ DamageCauser };
     const bool bDoFullDamage = true;
 
-    UGameplayStatics::ApplyRadialDamage(this, DamageTaken, Hit.ImpactPoint, WallStrength, TSubclassOf<UDamageType>(), 
+    UGameplayStatics::ApplyRadialDamage(this, DamageTaken, Hit.ImpactPoint, WallStrength, TSubclassOf<UDamageType>(),
         IgnoredActors, DamageCauser, InstegatedController, bDoFullDamage, ECollisionChannel::ECC_Visibility);
 
 
